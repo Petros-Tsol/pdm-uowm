@@ -1,0 +1,35 @@
+#cpside {
+	position:relative;
+	float:left;
+	display:block;
+	vertical-align:top;
+}
+
+#cpside button{
+	width : 170px;
+	background: #3498DB;
+	background-image: linear-gradient(to bottom, #3498DB, #2980B9);
+	border-radius: 28px;
+	font-family: Arial;
+	color: #FFFFFF;
+	font-size: 18px;
+	padding: 10px 20px 10px 20px;
+	text-decoration: none;
+	margin-bottom:8px;
+}
+
+#cpside button:hover{
+	background: #3CB0FD;
+	background-image: linear-gradient(to bottom, #3CB0FD, #3498DB);
+	text-decoration: none;
+}
+
+#cpside a{
+	overflow:visible;
+	width:120px;
+	color:#1213CD;
+	text-decoration:underline;
+	text-align:center;
+	margin-left:25px;
+	display:block;
+}

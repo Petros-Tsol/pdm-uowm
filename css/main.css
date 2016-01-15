@@ -1,0 +1,37 @@
+body{
+	margin-left: 15%;
+	margin-right: 15%;
+	background: linear-gradient(white, #5F8EFF);
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+}
+
+
+h1{
+	color:blue;
+	margin-top:0px;
+}
+
+#admin{
+	position:absolute;
+	top:2em;
+	right:15%;
+	text-align:right;
+}
+
+#footer{
+	position:relative;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:150px;
+	width:30em;
+	white-space:nowrap;
+}
+
+.submit_btn{
+	padding:5px 10px;
+	text-align:center;
+	width:120px;
+	height:inherit;
+	background-color:#00B0E0;
+}

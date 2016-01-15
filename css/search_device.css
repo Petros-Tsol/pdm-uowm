@@ -1,0 +1,38 @@
+#results table{
+	border-collapse:collapse;
+	background-color:#A9FFFF;
+}
+
+#results > table td,th{
+	border:1px solid black;
+	text-align: center;
+	padding:5px;
+}
+
+#results{
+	position:relative;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:15px;
+	width:30em;
+	padding:2em;
+}
+
+#results .form_result{
+	background-color:#A9FFFF;
+	padding:2em;
+	width:16em;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+#results .submit_btn {
+	width:80px;
+}
+
+#retDiv{
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:10px;
+	text-align:center;
+}		
