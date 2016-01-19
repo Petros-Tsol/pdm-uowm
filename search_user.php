@@ -19,6 +19,9 @@
 	<link rel="stylesheet" type="text/css" href="css/search_user.css">
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/search_user.js"></script>
 </head>
 
 <body>
@@ -86,117 +89,7 @@ $conn = NULL;
 	
 	
 <?php include 'footer.php'; ?>
-<script>
-	function checkname(arg,flname) {
-		var patt=/^[A-z]+$/g;
-		var check = patt.test(arg);
-		if (check) {
-			document.getElementsByName(flname)[0].style.backgroundColor="green";
-			if (flname == "fname"){
-				validfn=1;
-			} else {
-				validln=1;
-			}
-		} else {
-			document.getElementsByName(flname)[0].style.backgroundColor="red";
-			if (flname == "fname"){
-				validfn=0;
-			} else {
-				validln=0;
-			}
-		}
-		enablebutton();
 
-	}
-	
-	function notblank(arg){
-		if (arg.length>0){
-			document.getElementsByName("uname")[0].style.backgroundColor="green";
-			validun = 1;
-		} else {
-			document.getElementsByName("uname")[0].style.backgroundColor="red";
-			validun = 0;
-		}
-		enablebutton();
-	}
-	
-	function enablebutton(){
-		if (validln==1 && validfn == 1 && validun == 1)
-		{
-			document.getElementsByName("update_user")[0].disabled = false;
-		} else {
-			document.getElementsByName("update_user")[0].disabled = true;
-		}
-	}
-	
-	function pass_data(arg){
-		var id=arg.substring(0,arg.length-1);
-		un = document.getElementById(id).innerHTML;
-		var send_data="admin=".concat(un);
-		
-		var xmlhttp;
-		if (window.XMLHttpRequest)
-		  {// code for IE7+, Firefox, Chrome, Opera, Safari
-			xmlhttp=new XMLHttpRequest();
-		  }
-		else
-		  {// code for IE6, IE5
-			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-		  }
-		
-		xmlhttp.onreadystatechange=function()
-		  {
-		  if (xmlhttp.readyState==4 && xmlhttp.status==200)
-			{
-				document.getElementById("results").innerHTML="";
-				document.getElementById("results").innerHTML=xmlhttp.responseText;
-			}
-		  }
-		
-
-		xmlhttp.open("POST","modify_user.php",true);
-		xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-		xmlhttp.send(send_data);
-		
-	}
-	
-	function dlt_us(arg){
-		var n=document.getElementsByName(arg)[0].value;
-
-		var xmlhttp2;
-		if (window.XMLHttpRequest)
-		  {// code for IE7+, Firefox, Chrome, Opera, Safari
-			xmlhttp2=new XMLHttpRequest();
-		  }
-		else
-		  {// code for IE6, IE5
-			xmlhttp2=new ActiveXObject("Microsoft.XMLHTTP");
-		  }
-		
-		xmlhttp2.onreadystatechange=function()
-		  {
-		  if (xmlhttp2.readyState==4 && xmlhttp2.status==200)
-			{
-				document.getElementById("retDiv").innerHTML=xmlhttp2.responseText;
-			}
-		  }
-		  
-
-		if (n.localeCompare("Delete")==0) {
-			var send_data="delete_user=".concat(document.getElementsByName("uname")[0].value);
-			xmlhttp2.open("POST","upddel_user.php",true);
-			xmlhttp2.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-			xmlhttp2.send(send_data);
-		} else {
-			var send_data="update_user=".concat(document.getElementsByName("uname")[0].value,"&lname=",document.getElementsByName("lname")[0].value,"&fname=",document.getElementsByName("fname")[0].value,"&email=",document.getElementsByName("email")[0].value);
-			xmlhttp2.open("POST","upddel_user.php",true);
-			xmlhttp2.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-			xmlhttp2.send(send_data);
-		}
-	
-	}
-	
-</script>
 </body>
 </html>
 

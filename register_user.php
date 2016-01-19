@@ -126,6 +126,8 @@ $conn = NULL;
     <link rel="stylesheet" type="text/css" href="css/form.css">
     
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/validation.js"></script>
 </head>
 <body>
 <?php
@@ -138,7 +140,7 @@ $conn = NULL;
 <form method="post" action="register_user.php">	
 	<label>
 		<span>Username:</span>
-		<input type="text" name="uname" maxlength="15" value="<? echo $username; ?>" onblur="notblank(this.value);">  
+		<input type="text" name="uname" maxlength="15" value="<?php echo $username; ?>" onblur="notblank(this.value,this.name);">  
 	</label>
 	
 	<?php
@@ -161,7 +163,7 @@ $conn = NULL;
 	<br>
 	<label>
 		<span>E-mail:</span>
-		<input type="email" name="email" maxlength="50" value="<?php echo $email; ?>"onblur="checkemail(this.value,this.name);">		
+		<input type="email" name="email" maxlength="50" value="<?php echo $email; ?>" onblur="checkemail(this.value,this.name);">		
 	</label>
 	
 	<?php
@@ -202,65 +204,7 @@ $conn = NULL;
 </div>
 <?php include 'footer.php'; ?>
 <script>
-	
-	var validfn;
-	var validln;
-	var validem;
-	var validun;
-	
-	function checkname(arg,flname) {
-		var patt=/^[A-z]+$/g;
-		var check = patt.test(arg);
-		if (check) {
-			document.getElementsByName(flname)[0].style.backgroundColor="green";
-			if (flname == "fname"){
-				validfn=1;
-			} else {
-				validln=1;
-			}
-		} else {
-			document.getElementsByName(flname)[0].style.backgroundColor="red";
-			if (flname == "fname"){
-				validfn=0;
-			} else {
-				validln=0;
-			}
-		}
-		enablebutton();
-	}
-	
-	function checkemail(arg,nemail){
-		var patt=/^[_\.0-9a-zA-Z-]+@[0-9a-zA-Z][0-9a-zA-Z-]+\.+[a-zA-Z]{2,6}$/g;
-		var check = patt.test(arg);
-		if (check) {
-			document.getElementsByName(nemail)[0].style.backgroundColor="green";
-			validem=1;
-		} else {
-			document.getElementsByName(nemail)[0].style.backgroundColor="red";
-			validem=0;
-		}
-		enablebutton();
-	}	
-	
-	function notblank(arg){
-		if (arg.length>0){
-			document.getElementsByName("uname")[0].style.backgroundColor="green";
-			validun = 1;
-		} else {
-			document.getElementsByName("uname")[0].style.backgroundColor="red";
-			validun = 0;
-		}
-		enablebutton();
-	}
-	
-	function enablebutton(){
-		if (validln==1 && validfn == 1 && validem == 1 && validun == 1)
-		{
-			document.getElementsByName("submit_reg")[0].disabled = false;
-		} else {
-			document.getElementsByName("submit_reg")[0].disabled = true;
-		}
-	}
+
 </script>
 </body>
 </html>

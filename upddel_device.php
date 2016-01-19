@@ -6,7 +6,7 @@ $conn=connect_db($host,$db,$db_user,$db_pass);
 
 
 if (isset($_POST['delete_device'])){
-		$screen = $_POST['delete_device'];
+		$screen = filter_var($_POST['delete_device'],FILTER_SANITIZE_STRING,FILTER_FLAG_STRIP_LOW);
 		$sql_query=$conn->prepare("DELETE FROM screens WHERE name=?");
 		$sql_query->bindParam(1,$screen);
 		$sql_query->execute();

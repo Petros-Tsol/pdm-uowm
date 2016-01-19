@@ -24,14 +24,3 @@
 	<br>
 	<button onclick = "location.href='active_screen.php'">Active Screens</button>
 </div>
-
-<script>
-$(document).ready(function(){
-	
-	$(".menu_button").click(function(){
-		$(this).next().fadeToggle(100);
-		$(this).next().next().fadeToggle(100);
-	});
-	
-});
-</script>

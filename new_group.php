@@ -64,6 +64,8 @@ $conn = NULL;
     
     
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/validation.js"></script>
 </head>
 
 
@@ -77,7 +79,7 @@ $conn = NULL;
 	<form method="post" action="new_group.php">
 		<label>
 			<span>Group Name:</span>
-			<input type="text" name="gname" maxlength="25" value="<? echo $group; ?>" onblur="notblank(this.value);">    	
+			<input type="text" name="gname" maxlength="25" value="<?php echo $group; ?>" onblur="notblank(this.value,this.name);">    	
 		</label>
 			<?php
 			if (isset($_POST['submit_reg']) && $unique_group==0){
@@ -93,16 +95,5 @@ $conn = NULL;
 	<div class = "success"><?php echo $success_msg; ?></div>
 	</div>
 	<?php include 'footer.php'; ?>
-<script>
-	function notblank(arg){
-		if (arg.length>0){
-			document.getElementsByName("gname")[0].style.backgroundColor="green";
-			document.getElementsByName("submit_reg")[0].disabled = false;
-		} else {
-			document.getElementsByName("gname")[0].style.backgroundColor="red";
-			document.getElementsByName("submit_reg")[0].disabled = true;
-		}
-	}
-</script>
 </body>
 </html>

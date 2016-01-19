@@ -1,0 +1,20 @@
+html {
+	width:99%;
+	height:99%;
+	overflow:hidden;
+}
+
+#pdm_choose_screen{
+	width:40em;
+	margin:0px auto;
+	box-sizing:border-box;
+	background-color:#A9FFFF;
+	text-align:center;
+	padding:2em 4em;
+}
+
+#pdm_title {
+	text-align:center;
+	color: blue;
+	font-size:3em;
+}

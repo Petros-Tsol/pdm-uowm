@@ -1,0 +1,43 @@
+#container{
+	position:relative;
+	border:1px solid black;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:4em;
+	width:20em;
+	background-color:#A9FFFF;
+	padding:4em;
+}
+
+#users{
+	width:6em;
+	float:left;
+	whitespace:nowrap;
+
+}
+
+#screens{
+	float:right;
+	margin-left:em;
+	whitespace:nowrap;
+}
+
+#container h1{
+	text-align:center;
+}
+
+#groups{
+	margin-left:7em;
+	margin-bottom:10px;
+	background-color:white;
+	padding:6px 4px;
+}
+#upd_group{
+	margin-top:18%;
+}
+
+#success_msg{
+	background-color:#49D737;
+	text-align:center;
+	margin-top:10px;
+}

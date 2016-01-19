@@ -14,213 +14,7 @@
 	<meta charset="UTF-8">
     <title>PD - Layout Design</title>
 
-	<style>	
-		.close_btn {
-			color : white;
-			font-size : 120%;
-			background-color: black;
-			border: 1px solid black;
-			border-radius: 50%;
-			position:absolute;
-			top:0%;
-			left:100%;
-			opacity : 0.6;
-		}
-		
-		.dlt_layout {
-			background:none;
-			border:none; 
-			padding:0;
-			color:#FD1E11;
-			text-decoration:underline;
-			cursor:pointer;			
-			position:relative;
-			z-index:10;
-		}
-		
-		#draw_area_cont{
-			position:fixed;
-			width:70%;
-			height:inherit;
-		}
-		
-		#draw_area{
-			/* width:1280px; */
-			width:100%;
-			height:inherit;
-			background-color:#f1f9b8;
-			z-index:-1;
-		}
-
-		.div_name{
-			position : absolute;
-			top : -3em;
-			opacity : 0.4;
-		}
-		
-		#buttons{
-			position:relative;
-			display:inline;
-		}
-		
-		#saved_layouts{
-			margin-top:20px;
-			position:relative;
-			left:0%;
-			overflow-y:scroll;
-			width : 18.2em;
-			height :91%;
-			margin-left:20%;
-		}
-		
-		.thub_layout{
-			position:absolute;
-			height:100%;
-			width:100%;
-		}
-		
-		.wrapper{
-			margin-bottom:1em;
-			width:100%;
-			position:relative;
-			height:25%;
-			left : 0em;
-			background-color:#000000;
-		}
-		
-		.wrapper:last-child{
-			margin-bottom:0em;
-		}
-		
-		html, body {
-			width:99%;
-			height:99.1%;
-			min-width : 50%;
-		}
-		
-		
-		img ~ :not(.qrcode_link), img ~ :not(.qrcode_layout)  {
-			width: 100%;
-			height: 100%;
-		}
-		
-		table,td,th {
-			border: 1px solid black;
-			border-collapse: collapse;
-			text-align:center;
-		}
-		
-		.input_date_time{
-			width:95%;
-		}
-		
-		#timer_mode .input_date_time{
-			width:30%;
-		}
-		
-		
-		
-		.wrapper:hover{
-			cursor:crosshair;
-		}
-		
-		/* "important" override the previous rule */
-		.draw_div:hover{
-			z-index : 9999 !important;
-			border : thin dashed #ADD8E6 !important;
-		}
-		
-		#hidden_draw_area{
-			width:70%;
-			height:100%;
-			display:none;
-		}
-		
-		#tools{
-			position:absolute;
-			display:inline;
-			left:71%;
-			width:29%;
-			height:99%;
-		}
-		
-		#mode{
-			position:relative;
-		}
-		
-		#divs_scheduler{
-			position:relative;	
-		}
-		
-		#toolbox{
-			position:relative;
-			display:none;
-		}
-		
-		#user_textarea, #html_textarea{
-			width:95%;
-			height:10em;
-			border: 1px solid #000000;
-		}
-		
-		.colorpick_div{
-			display:inline-flex;
-			background-color:#000000;
-			width:120px;
-			height:15px;
-			margin:5px;
-			border: 1px solid black;
-		}
-		
-		.pressed {
-			background-color:red;
-		}
-		
-		.modalDialog {
-			position: fixed;
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
-			background: rgba(0,0,0,0.1);
-			z-index: 99999;
-			opacity:0;
-			pointer-events: none;
-		}
-
-		.modalDialog:target {
-			opacity:1;
-			pointer-events: auto;
-		}
-
-		.modalDialog > div {
-			width: 15%;
-			position: relative;
-			margin: 10% auto;
-			padding: 4px 10px 10px 10px;
-			background: #ffffff;
-			text-align: center;
-		}
-
-		.close {
-			background: #000000;
-			color: #FFFFFF;
-			position: absolute;
-			right: -12px;
-			text-align: center;
-			top: -10px;
-			width: 24px;
-			text-decoration: none;
-			font-weight: bold;
-			border-radius: 50%;
-		}
-		
-		#select_cont_name_div, #new_cont_name_div {
-			display:none;
-		}
-		
-		
-	</style>
+	<link rel="stylesheet" type="text/css" href="css/layout_design.css">
 
     <script src="http://code.jquery.com/jquery-2.1.1.js"></script>
     <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
@@ -244,9 +38,9 @@
 	
 	<div id = "buttons">
 		<button id = "lay_but">Layouts</button>	
-		<button id = "tool_but">Tools</button>
+		<button id = "tool_but">Options</button>
 		<button id = "divs_but">Manage Divs</button>
-		<button id = "cont_but">Manage Contents</button><br>
+		<button id = "cont_but">Manage Contents</button><br><hr>
 		<button id = "new_btn">New Layout</button>
 		<button id = "save_btn">Save Layout</button>
 		<a href = "#openModal"><button onclick="document.getElementById('select_cont_name_div').style.display='none';document.getElementById('new_cont_name_div').style.display='none';">Save Content</button></a>
@@ -277,7 +71,7 @@
 			}
 			$conn = NULL;
 			?>
-		</select><br>
+		</select><br><hr>
 		<div id="openModal" class="modalDialog">
 			<div>
 				<a href="#close" class="close">X</a>
@@ -376,7 +170,7 @@
 		<div id = "current_divs"></div>
 		<div id = "div_scheduler">
 			<h4>DIV SCHEDULER</h4>
-			<table>
+			<table id ="table_scheduler">
 				<tr>
 					<th>DATE<br></th>
 					<th>HOUR<br></th>
@@ -487,7 +281,7 @@
 				
 				width = Math.abs(end_x - start_x);
 				height = Math.abs(end_y - start_y);
-				if (width >= 60 && height >= 30) {
+				if (width >= 60 && height >= 20) {
 					if (end_x > start_x && end_y > start_y) { //direction top->bottom and left->right
 						//width = end_x - start_x;
 						//height = end_y - start_y;
@@ -527,7 +321,7 @@
 					$(newdiv).append('<button type="button" id = "close'+i+'" class = "close_btn">X</button>');
 					
 					$(newdiv).draggable({containment: "parent"});
-					$(newdiv).resizable({containment: "parent", minHeight:30, minWidth:60});
+					$(newdiv).resizable({containment: "parent", minHeight:20, minWidth:60});
 					get_divs("current_divs");
 					get_divs("mode");
 
@@ -728,6 +522,24 @@
 		load_layouts();
 		$(".datepicker").datepicker({dateFormat:"dd/mm/yy"});
 		$(".timepicker").timepicker();
+		
+		$("#lay_but").click(function(){
+			$(".options_menu").hide();
+			$("#saved_layouts").fadeToggle(100);
+		});
+		$("#tool_but").click(function(){
+			$(".options_menu").hide();
+			$("#toolbox").fadeToggle(100);
+		});
+		$("#divs_but").click(function(){
+			$(".options_menu").hide();
+			$("#div_management").fadeToggle(100);
+			$("#manage_div").trigger("change");
+		});
+		$("#cont_but").click(function(){
+			$(".options_menu").hide();
+			$("#content_rotation").fadeToggle(100);
+		});
 	});
 	
 	function convert_css_styles(){ //convert webkit to mozilla syntax and vice-versa.
@@ -1049,7 +861,7 @@
 		$("#hidden_draw_area button").remove();
 		$("#hidden_draw_area .ui-resizable-handle").remove();
 		$("#hidden_draw_area").children().removeClass();
-		$("#hidden_draw_area").children().attr("id","");
+		$("#hidden_draw_area").children().removeAttr("id");
 		var thub_data = $("#hidden_draw_area").html();
 		//alert (thub_data);
 
@@ -1070,6 +882,8 @@
 			}
 			if (data != null) {
 				layout_id = data['id'];
+				$("#saved_layouts").empty();
+				load_layouts();
 				$("#server_return").empty();
 				$("#server_return").append('<span style="background-color:#C1BE2B;">'+data['msg']+'</span>');
 			}
@@ -1155,7 +969,7 @@
 			$(".draw_div").draggable({containment: "parent"});
 
 			$(".ui-resizable-handle").remove();
-			$(".draw_div").resizable({containment: "parent", minHeight:60, minWidth:60});
+			$(".draw_div").resizable({containment: "parent", minHeight:20, minWidth:60});
 			
 			get_divs("mode");
 			get_divs("current_divs");
@@ -1195,7 +1009,7 @@
 				$(".draw_div").draggable({containment: "parent"});
 
 				$(".ui-resizable-handle").remove();
-				$(".draw_div").resizable({containment: "parent", minHeight:60, minWidth:60});
+				$(".draw_div").resizable({containment: "parent", minHeight:20, minWidth:60});
 				
 				$(".clock_visibility").FlipClock({
 					clockFace: 'TwentyFourHourClock',
@@ -1280,36 +1094,10 @@
 	});
 	
 	$(document).ready(function(){
-		$("#lay_but").click(function(){
-			$(".options_menu").hide();
-			$("#saved_layouts").fadeToggle(100);
-		});
-		$("#tool_but").click(function(){
-			$(".options_menu").hide();
-			$("#toolbox").fadeToggle(100);
-		});
-		$("#divs_but").click(function(){
-			$(".options_menu").hide();
-			$("#div_management").fadeToggle(100);
-			$("#manage_div").trigger("change");
-		});
-		$("#cont_but").click(function(){
-			$(".options_menu").hide();
-			$("#content_rotation").fadeToggle(100);
-		});
+		
 	});
 	
-	$(document).on('click',".text_properties",function(){
-		var write_div = $("#mydiv").val(); //the div which the message will be printed
-		var button_value = $(this).val(); //bold;italic;underline
-		$("#"+write_div).not(":has(span)").append('<div class="show_text"></div>');
 
-		var mytext = $("#textarea").get(0);
-		mytext = mytext.value.substring(mytext.selectionStart, mytext.selectionEnd);
-		if (button_value=="bold"){
-			
-		}
-	});
 
 	$(document).on('change',"#data_form input", function() {
 		if ($("#mydiv").length > 0 && $("#mydiv").val()!=null) { //if a layout has been selected.
@@ -1318,7 +1106,8 @@
 				if (!$("#text_mode").length){ //check if this menu has been created.
 					$("#mode").append('<div id="text_mode" class="tools_menu">');
 						$("#text_mode").append('<textarea id="user_textarea"></textarea>');
-						CKEDITOR.replace('user_textarea');					
+						CKEDITOR.replace('user_textarea');	
+						$("#text_mode").append('<input type="checkbox" name="scroll" class="text_properties">Scrolling text<br>');
 					$("#mode").append('</div>');
 				}
 				var ck_editor = CKEDITOR.instances.user_textarea;
@@ -1327,7 +1116,7 @@
 					var slc_div = $("#mydiv").val();
 					$("#"+slc_div).not(":has(.show_text)").append('<div class="show_text"></div>');
 					var user_data = ck_editor.getData();
-					$('#'+slc_div+' > .show_text').html(user_data);
+					$('#'+slc_div+' .show_text').html(user_data);
 				});
 				$("#text_mode").show();
 			} else  if ($("input[name=data_type]:eq(1)").prop("checked")) {
@@ -1715,30 +1504,27 @@
 		$("#"+slc_div+" > .pure_html").append(html_code);
 	});
 	
-	/* IT WILL BE USED!!!!
-	$(document).on('keyup click change','#textarea, .text_properties',function(){
-		var write_div = $("#mydiv").val(); //the div which the message will be printed
-		$("#"+write_div).not(":has(span)").append('<div class="show_text"><span></span></div>');
+	$(document).on('click','.text_properties',function(){
+		var write_div = $("#mydiv").val();
 		
 		if($("input[name=scroll]").is(":checked")){
-			$("#"+write_div+" > div").addClass("scrolling_text");
+			$("#"+write_div+" > .show_text").addClass("scrolling_text");
+			$("#"+write_div+" > .show_text").wrap("<div></div>");
 			$("#"+write_div+" > div").css("overflow","hidden");
-			$("#"+write_div+" > div > span").css({"white-space":"nowrap",
+			$("#"+write_div+" > div > .show_text").css({"white-space":"nowrap",
 				"display":"inline-table",
 				"position":"relative",
 				"left":100+'%'});
 		} else {
-			$("#"+write_div+" > div").removeClass("scrolling_text");
-			$("#"+write_div+" > div > span").css({"white-space":"normal",
+			$("#"+write_div+" > div > .show_text").removeClass("scrolling_text");
+			$("#"+write_div+" > div > .show_text").unwrap();
+			$("#"+write_div+" > .show_text").css({"white-space":"normal",
 				"display":"block",
 				"left":0+'%',
 				"position":"static"});
 		}
-		
-		$("#"+write_div+" > div > span").empty();
-		$("#"+write_div+" > div > span").append($('#textarea').html());
 	});
-	*/
+	
 
 </script>
 </body>

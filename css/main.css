@@ -7,9 +7,14 @@ body{
 }
 
 
-h1{
-	color:blue;
-	margin-top:0px;
+.main_title{
+	text-align:center;
+	color: blue;
+	font-size:3em;
+}
+
+#head_title{
+	color: blue;
 }
 
 #admin{
@@ -23,9 +28,10 @@ h1{
 	position:relative;
 	margin-left:auto;
 	margin-right:auto;
+	text-align:center;
 	margin-top:150px;
-	width:30em;
-	white-space:nowrap;
+	width:20em;
+	white-space:normal;
 }
 
 .submit_btn{

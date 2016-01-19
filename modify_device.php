@@ -19,23 +19,25 @@ if (isset($_POST['screen'])){
 	//print '<form>';
 	print '<div class="form_design">';
 		print '<h1>Update Screen</h1>';
-		print '<label>';
-			print '<span>Screen Name:</span><br>';
-			print '<input id = "'.$id.'" type="text" name="scrname" maxlength="20" value="'.$screen.'" onblur="notblank(this.value,this.name);"/>';
-		print '</label>';
+		print '<form action="javascript:void(0)">';
+			print '<label>';
+				print '<span>Screen Name:</span><br>';
+				print '<input id = "'.$id.'" type="text" name="scrname" maxlength="20" value="'.$screen.'" onblur="notblank(this.value,this.name);"/>';
+			print '</label>';
+			
+			
+			print '<label>';
+				print '<span>Description:</span><br>';
+				print '<input type="text" name="description" maxlength="30" value="'.$descr.'" onblur="notblank(this.value,this.name);">';
+			print '</label>';
 		
-		
-		print '<label>';
-			print '<span>Description:</span><br>';
-			print '<input type="text" name="description" maxlength="30" value="'.$descr.'" onblur="notblank(this.value,this.name);">';
-		print '</label>';
-	
-		
-		print '<span>';
-			print '<button name="update_device" value="Update" onclick="dlt_us(this.name);" disabled >Update</button>';
-			print str_repeat('&nbsp;', 1);
-			print '<button name="delete_device" value="Delete" onclick="dlt_us(this.name);">Delete</button>';
-		print '</span>';
+			
+			print '<span>';
+				print str_repeat('&nbsp;', 8);
+				print '<input type="submit" name="submit_reg" class = "submit_btn" value="Update" onclick="upd_dlt_dev(this.name);" disabled>';
+				print '<button name="delete_device" class = "submit_btn" value="Delete" onclick="upd_dlt_dev(this.name);">Delete</button>';
+			print '</span>';
+		print '</form>';
 		print '<div id="retDiv"></div>';
 	print '</div>';
 	//print '</form>';

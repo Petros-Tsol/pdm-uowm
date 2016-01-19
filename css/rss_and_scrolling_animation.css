@@ -1,0 +1,63 @@
+.rss_feed > div { /* rss feed animation on client */
+	/* Normal move from right to left */
+	-webkit-animation-direction: normal; 
+	animation-direction: normal;
+	
+	/* How long it will be last */
+	-webkit-animation-duration: 60s;
+	animation-duration: 60s;
+	
+	/* How many times it will be executed */
+	-webkit-animation-iteration-count: infinite;
+	animation-iteration-count: infinite;
+	
+	/* Animation name */
+	-webkit-animation-name: auto_scroll_rss;
+	animation-name: auto_scroll_rss;
+	
+	/*Keep the same speed throught the move */
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+}
+
+.scrolling_text{
+	/* Starting position far right 
+	-webkit-transform:translateX(100%);	
+	transform:translateX(100%); */
+	
+	/* Normal move from right to left */
+	-webkit-animation-direction: normal; 
+	animation-direction: normal;
+	
+	/* How long it will be last */
+	-webkit-animation-duration: 10s;
+	animation-duration: 10s;
+	
+	/* How many times it will be executed */
+	-webkit-animation-iteration-count: infinite;
+	animation-iteration-count: infinite;
+	
+	/* Animation name */
+	-webkit-animation-name: scroll_text;
+	animation-name: scroll_text;
+	
+	/*Keep the same speed throught the move */
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+}
+
+@-webkit-keyframes auto_scroll_rss{ /* rss text animation */
+	100% {-webkit-transform:translateY(-100%);}
+}
+	
+@keyframes auto_scroll_rss{ /* rss text animation */
+	to {transform:translateY(-100%);}
+}
+
+@-webkit-keyframes scroll_text{ /* scroll text animation */
+	100% {left:0%;-webkit-transform:translateX(-100%);}
+}
+
+@keyframes scroll_text{ /* scroll text animation */
+	to {left:0%;transform:translateX(-100%);}
+}

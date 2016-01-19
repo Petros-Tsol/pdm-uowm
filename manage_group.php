@@ -14,53 +14,11 @@
     <meta charset="UTF-8">
 	<link rel="stylesheet" type="text/css" href="css/sidebar.css">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
-	<style>
-		#container{
-			position:relative;
-			border:1px solid black;
-			margin-left:auto;
-			margin-right:auto;
-			margin-top:4em;
-			width:20em;
-			background-color:#A9FFFF;
-			padding:4em;
-		}
-		
-		#users{
-			width:6em;
-			float:left;
-			whitespace:nowrap;
-
-		}
-		
-		#screens{
-			float:right;
-			margin-left:em;
-			whitespace:nowrap;
-		}
-		
-		#container h1{
-			text-align:center;
-		}
-		
-		#groups{
-			margin-left:7em;
-			margin-bottom:10px;
-			background-color:white;
-			padding:6px 4px;
-		}
-		#upd_group{
-			margin-top:18%;
-		}
-		
-		.success{
-			background-color:#49D737;
-			text-align:center;
-			margin-top:10px;
-		}
-		
-	</style>
+	<link rel="stylesheet" type="text/css" href="css/manage_group.css">
+	
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/manage_group.js"></script>
 </head>
 
 
@@ -116,7 +74,7 @@
 			}
 			print '</div>';
 			print '<button id = "upd_group" class="submit_btn">Update</button>';
-			print '<div class = "success"></div>';
+			print '<div id = "success_msg"></div>';
 	print '</div>';
 	
 	
@@ -124,63 +82,6 @@
 	?>
 
 <?php include 'footer.php'; ?>
-<script>
-	$(document).on('change',"#groups", function() {
-		var slc_group = $("#groups").val();
-		
-		$.ajax({
-			type:"POST",
-			url:"group_management_sql.php",
-			data : {button:"select",group:slc_group}
-		})
-		 .done(function(n) {
-			var data = JSON.parse(n); //decode the data
-			$("input[name='screen']").prop('checked',false); //clear all checkboxes
-			$("input[name='user']").prop('checked',false);
-			//console.log(data.users.length);
-			
-			for (var i = 0;i < data.screens.length;i=i+1) {
-				$("input[name='screen']").each(function(){
-					if ($(this).val()==data.screens[i][0]) {
-						$(this).prop('checked',true); //check the boxes which match the screen
-					}
-				});
-			}
-			
-			for (var i = 0;i < data.users.length;i=i+1) {
-				$("input[name='user']").each(function(){
-					if ($(this).val()==data.users[i][0]) {
-						$(this).prop('checked',true);
-					}
-				});
-			}
-		}); 
-	});
-	
-	$("#groups").trigger("change");
-	$(document).on('click',"#upd_group", function() {
-		var slc_group = $("#groups").val();
-		var slc_users = $("input[name='user']:checked").map(function(){
-			return this.value;
-		}).get();
-		
-		var slc_screens = $("input[name='screen']:checked").map(function(){
-			return this.value;
-		}).get();
-		
-		
-		$.ajax({
-			type:"POST",
-			url:"group_management_sql.php",
-			data : {button:"update",group:slc_group,users:slc_users,screens:slc_screens}
-		})
-		 .done(function(n) {
-			//alert(n);
-			$(".success").empty();
-			$(".success").append(n);
-		});
-	});
-</script>
 </body>
 </html>
 

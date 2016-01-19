@@ -41,6 +41,8 @@
     <link rel="stylesheet" type="text/css" href="css/form.css">
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/validation.js"></script>
 </head>
 <body>
 	
@@ -68,17 +70,5 @@
 		<div class = "success"><?php echo $success_msg; ?></div>
 	</div>
 	<?php include 'footer.php'; ?>
-	<script>
-		function check_sim() {
-			var pass1 = document.getElementsByName("password")[0].value;
-			var pass2 = document.getElementById("retype").value;
-			
-			if (pass1 == pass2 && pass1!="") {
-				document.getElementsByName("change_pass")[0].disabled = false;
-			} else {
-				document.getElementsByName("change_pass")[0].disabled = true;
-			}
-		}
-	</script>
 </body>
 </html>

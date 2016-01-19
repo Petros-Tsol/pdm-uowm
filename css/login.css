@@ -1,0 +1,19 @@
+#login_form{
+	width:25em;
+	margin:0px auto;
+	box-sizing:border-box;
+	background-color:#A9FFFF;
+	text-align:center;
+	padding:1em 5em;
+}
+
+input{
+	width:180px;
+	height:20px;
+	border:1px solid #DBDBDB;
+	margin-bottom:13px;
+}
+
+#error{
+	background-color : #E53023;
+}

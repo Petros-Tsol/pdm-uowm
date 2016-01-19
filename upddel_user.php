@@ -6,7 +6,7 @@ $conn=connect_db($host,$db,$db_user,$db_pass);
 
 
 if (isset($_POST['delete_user'])){
-		$username = $_POST['delete_user'];
+		$username = filter_var($_POST['delete_user'],FILTER_SANITIZE_STRING,FILTER_FLAG_STRIP_LOW);
 		$sql_query=$conn->prepare("DELETE FROM users_information WHERE username=?");
 		$sql_query->bindParam(1,$username);
 		$sql_query->execute();

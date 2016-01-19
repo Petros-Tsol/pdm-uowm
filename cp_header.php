@@ -1,4 +1,4 @@
-<h1>UOWM PUBLIC DISPLAY</h1>
+<h1 id = "head_title">UOWM PUBLIC DISPLAY</h1>
 
 <?php
 if(isset($_SESSION["admin"])) 

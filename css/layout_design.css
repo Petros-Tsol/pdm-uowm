@@ -1,0 +1,236 @@
+html, body {
+	width:99%;
+	height:99.1%;
+	min-width : 50%;
+}
+
+/* TILL THE NEXT COMMENT THESE ELEMENTS ARE RELATIVE TO THE DESIGN AREA (#draw_area) */
+
+#draw_area_cont{ /* container of #draw_area */
+	position:fixed;
+	width:70%;
+	height:inherit;
+}
+
+#draw_area{ /* the area we create new divs */
+	width:100%;
+	height:inherit;
+	background-color:#f1f9b8;
+	z-index:-1;
+}
+
+#hidden_draw_area{ /* a hidden div to manipulate data when user update a screen*/
+	width:70%;
+	height:100%;
+	display:none;
+}
+
+.div_name{ /* name of the created div */
+	position : absolute;
+	top : -3em;
+	opacity : 0.4;
+}
+
+.draw_div:hover{ /* all the elements created from user are under .draw_div class */
+	z-index : 9999 !important; /* "!important" override the previous rule */
+	border : thin dashed #ADD8E6 !important;
+}
+
+.close_btn { /* button to delete divs */
+	color : white;
+	font-size : 120%;
+	background-color: black;
+	border: 1px solid black;
+	border-radius: 50%;
+	position:absolute;
+	top:0%;
+	left:100%;
+	opacity : 0.6;
+}
+
+/* TILL THE NEXT COMMENT THESE ELEMENTS ARE RELATIVE TO THE TOOLS THAT THE USER CAN CONTROL */
+
+#buttons{ /* element that containt the buttons (Layouts, tools, manage divs...) */
+	position:relative;
+	display:inline;
+}
+
+#saved_layouts{ /* the area that containts user layouts */
+	margin-top:20px;
+	position:relative;
+	left:0%;
+	overflow-y:scroll;
+	width : 18.2em;
+	height :91%;
+	margin-left:20%;
+}
+
+.thub_layout{ /* thubnail of a saved layout  */
+	position:absolute;
+	height:100%;
+	width:100%;
+}
+
+.wrapper{ /* container of .thub_layout */
+	margin-bottom:1em;
+	width:100%;
+	position:relative;
+	height:25%;
+	left : 0em;
+	background-color:#000000;
+}
+
+.wrapper:hover{
+	cursor:crosshair;
+}
+
+.wrapper:last-child{
+	margin-bottom:0em;
+}
+
+.dlt_layout { /* button to delete layout */
+	background:none;
+	border:none; 
+	padding:0;
+	color:#FD1E11;
+	text-decoration:underline;
+	cursor:pointer;			
+	position:relative;
+	z-index:10;
+}
+
+
+#divs_scheduler{ /* time rules of divs */
+	position:relative;	
+}
+
+#table_scheduler td, #table_scheduler th { /* div scheduler table */
+	border: 1px solid black;
+	border-collapse: collapse;
+	text-align:center;
+}
+
+.input_date_time{
+	width:95%;
+}
+
+#tools{ /* the side area that containts a series of options for user to generate his data */
+	position:absolute;
+	display:inline;
+	left:71%;
+	width:29%;
+	height:99%;
+}
+
+#mode{ /* an area where different modes expand (text,image,video....) */
+	position:relative;
+}
+
+#toolbox{ /* area that contains the different options of user (text,image,video....)*/
+	position:relative;
+	display:none;
+}
+
+.modalDialog { /*a div that opens when user press the button "save content" */
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(0,0,0,0.1);
+	z-index: 99999;
+	opacity:0;
+	pointer-events: none;
+}
+
+.modalDialog:target {
+	opacity:1;
+	pointer-events: auto;
+}
+
+.modalDialog > div {
+	width: 15%;
+	position: relative;
+	margin: 10% auto;
+	padding: 4px 10px 10px 10px;
+	background: #ffffff;
+	text-align: center;
+}
+
+.close { /* close .modalDialog */
+	background: #000000;
+	color: #FFFFFF;
+	position: absolute;
+	right: -12px;
+	text-align: center;
+	top: -10px;
+	width: 24px;
+	text-decoration: none;
+	font-weight: bold;
+	border-radius: 50%;
+}
+
+#select_cont_name_div, #new_cont_name_div {
+	display:none;
+}
+
+/* FROM NOW ON ALL THESE ELEMENTS REFER TO ELEMENTS CREATED BY USER */
+
+img ~ :not(.qrcode_link), img ~ :not(.qrcode_layout)  { /* images inserted by user */
+	width: 100%;
+	height: 100%;
+}
+
+#timer_mode .input_date_time{ /* mode of clock and countdown */
+	width:30%;
+}
+
+
+#user_textarea, #html_textarea{ /* the two textareas, under text and html option */
+	width:95%;
+	height:10em;
+	border: 1px solid #000000;
+}
+
+.colorpick_div{ /* a div that displays colors */
+	display:inline-flex;
+	background-color:#000000;
+	width:120px;
+	height:15px;
+	margin:5px;
+	border: 1px solid black;
+}
+
+.scrolling_text{ /* scroll text on X axis */
+	/* Starting position far right 
+	-webkit-transform:translateX(100%);	
+	transform:translateX(100%); */
+	
+	/* Normal move from right to left */
+	-webkit-animation-direction: normal; 
+	animation-direction: normal;
+	
+	/* How long it will be last */
+	-webkit-animation-duration: 10s;
+	animation-duration: 10s;
+	
+	/* How many times it will be executed */
+	-webkit-animation-iteration-count: infinite;
+	animation-iteration-count: infinite;
+	
+	/* Animation name */
+	-webkit-animation-name: scroll_text;
+	animation-name: scroll_text;
+	
+	/*Keep the same speed throught the move */
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+}
+
+@-webkit-keyframes scroll_text{ /* scroll text animation */
+	100% {left:0%;-webkit-transform:translateX(-100%);}
+}
+
+@keyframes scroll_text{ /* scroll text animation */
+	to {left:0%;transform:translateX(-100%);}
+}

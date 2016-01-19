@@ -84,6 +84,9 @@ $conn = NULL;
     
     <link rel="stylesheet" type="text/css" href="css/form.css">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    
+    <script src="js/sidebar.js"></script>
+    <script src="js/validation.js"></script>
 </head>
 <body>
 	
@@ -142,61 +145,6 @@ $conn = NULL;
 </div>
 <?php include 'footer.php'; ?>
 <script>
-	
-	var validdescr;
-	var validname;
-	
-	function enablebutton(){
-		if (validname == 1 && validdescr == 1 ) {
-			document.getElementsByName("submit_reg")[0].disabled = false;
-		} else {
-			document.getElementsByName("submit_reg")[0].disabled = true;
-		}
-	}
-
-	/*function isnumeric(arg,input) {
-		var patt=/^[0-9]+$/g;
-		var check = patt.test(arg);
-		if (check) {
-			document.getElementsByName(input)[0].style.backgroundColor="green";
-			if (input == "size") {
-				validsize = 1;
-			} else if (input == "res_width") {
-				validwidth = 1;
-			} else {
-				validheight = 1;
-			}
-		} else {
-			document.getElementsByName(input)[0].style.backgroundColor="red";
-			if (input == "size") {
-				validsize = 0;
-			} else if (input == "res_width") {
-				validwidth = 0;
-			} else {
-				validheight = 0;
-			}
-		}
-		enablebutton();
-	}*/
-	
-	function notblank(arg,input){
-		if (arg.length>0){
-			document.getElementsByName(input)[0].style.backgroundColor="green";
-			if (input == "scrname") {
-				validname = 1;
-			} else if (input == "description") {
-				validdescr = 1;
-			} 
-		} else {
-			document.getElementsByName(input)[0].style.backgroundColor="red";
-			if (input == "scrname") {
-				validname = 0;
-			} else if (input == "description") {
-				validdescr = 0;
-			} 
-		}
-		enablebutton();
-	}
 </script>
 </body>
 </html>

@@ -5,23 +5,19 @@ require_once('connect2db');
 
 if (isset($_POST['submit_login']))
 {
-	$user=$_POST['username'];
-	$pass=$_POST['password'];
+	$user=filter_var($_POST['username'],FILTER_SANITIZE_STRING,FILTER_FLAG_STRIP_LOW);
+	$pass=filter_var($_POST['password'],FILTER_SANITIZE_STRING,FILTER_FLAG_STRIP_LOW);
 
 	$conn=connect_db($host,$db,$db_user,$db_pass);
 
 	$sql_query=$conn->prepare("SELECT password FROM users_information WHERE username=?");
 	$sql_query->bindParam(1,$user);
 	$sql_query->execute();
-	$result=$sql_query->fetchAll();
+	$result=$sql_query->fetch();
 
-	foreach ($result as $row){
-		$hashed_pass = $row[0];
-	}
-
-	if (!empty($hashed_pass)) // if a user was found
+	if (!empty($result['password'])) // if a user was found
 	{
-		if (password_verify($pass,$hashed_pass)) { //verify the input password with the hashed
+		if (password_verify($pass,$result['password'])) { //verify the input password with the hashed
 			session_start();
 			$_SESSION["admin"] = htmlspecialchars($user);
 
