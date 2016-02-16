@@ -1,9 +1,18 @@
+html{
+	height:100%;
+	font-size:1em;
+	font-family:serif;
+}
+
 body{
-	margin-left: 15%;
-	margin-right: 15%;
+	position:relative;
+	margin-left: 10%;
+	margin-right: 10%;
 	background: linear-gradient(white, #5F8EFF);
 	background-repeat: no-repeat;
 	background-attachment: fixed;
+	height:inherit;
+	min-height:100%;
 }
 
 
@@ -19,11 +28,12 @@ body{
 
 #admin{
 	position:absolute;
-	top:2em;
-	right:15%;
+	top:0em;
+	right:0%;
 	text-align:right;
 }
 
+/* THIS IS FUNCTIONAL
 #footer{
 	position:relative;
 	margin-left:auto;
@@ -32,6 +42,17 @@ body{
 	margin-top:150px;
 	width:20em;
 	white-space:normal;
+}*/
+
+#footer{
+	position:relative;
+	top:10%;
+	width:20em;
+	text-align:center;
+	margin-left:auto;
+	margin-right:auto;
+	white-space:normal;
+	clear:both;
 }
 
 .submit_btn{

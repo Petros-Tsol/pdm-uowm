@@ -9,6 +9,5 @@ function random_webid($length) {
 	}
 	
 	return $generated;
-
 }
 ?>

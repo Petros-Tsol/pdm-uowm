@@ -27,13 +27,13 @@ foreach ($users as $row) {
 		$screen_name = $sql_query->fetch();
 		
 		if (!empty($screen_name)){
-			$offline_screens = $offline_screens.$screen_name['name'].'<br>';
+			$offline_screens = $offline_screens.$screen_name['name']."\r\n";
 		}
 	}
 	if (!empty($offline_screens)) {
 		$to = $row['email'];
-		$message = "Hello ".$row['username'].". We would like to inform you that the below screens are offline:<br>\r\n".$offline_screens."Sincerely PDM UOWM Administration.";
-		//mail($to, $subject, $message,$headers); THIS LINE MUST COMMENTED OUT!!!!
+		$message = "Hello ".$row['username'].". We would like to inform you that the below screens are offline:\r\n".$offline_screens."Sincerely PDM UOWM Administration.";
+		//mail($to, $subject, $message,$headers); //THIS LINE MUST COMMENTED OUT!!!!
 		//echo $message;
 		//echo '<hr>';
 	}

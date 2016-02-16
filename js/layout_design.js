@@ -61,9 +61,8 @@ function draw(){ //function to draw divs
 					"top" : (100*start_y / $("#draw_area").height())+'%',
 					"background-color" : "#FFFFFF",
 					"position" : "absolute",
-					"border" : "2px solid",
-					"z-index" : 1,
-					"margin-bottom" : "1%"
+					"border" : "1px solid",
+					"z-index" : 1
 				});
 							
 				$(newdiv).append('<h5 class = "div_name">div'+i+'</h5>');
@@ -81,7 +80,9 @@ function draw(){ //function to draw divs
 }
 
 $(document).on("dragstop",".draw_div",function(){ //if a div moved, recalculate new position and convert width, height, top, and left in percentages in order to fit in any screen resolution.
-	start_y = $(this).position().top;
+	console.log($(this).position().top);
+	console.log($(this).parent().offset().top);
+	start_y = $(this).offset().top; //this work for sure for position() instead of offset()!!!!
 	start_x = $(this).position().left;
 	height = $(this).height();
 	width = $(this).width();
@@ -154,6 +155,26 @@ function load_layouts(){ //function to load the saved layouts and append them to
 	});
 }
 
+function load_contents(elem){
+	$.ajax({
+		type:"POST",
+		dataType:"json",
+		url:"layout_sql.php",
+		data : {button:"contents"}
+	})
+	.done(function(n) {
+		/*
+		$("#load_content").append('<option value ="pdm-default00">Content to load</option>');
+		$.each(n,function(ix){
+			$("#load_content").append('<option value ="'+n[ix][0]+'">'+n[ix][0]+'</option>');
+		});*/
+		$("#"+elem).append('<option value ="pdm-default00">Content to load</option>');
+		$.each(n,function(ix){
+			$("#"+elem).append('<option value ="'+n[ix][0]+'">'+n[ix][0]+'</option>');
+		});
+	});
+}
+
 function get_divs(element){//function to create a select box of the created divs
 //get the id attr of selected layout and generate select input
 	var divs = [];
@@ -173,11 +194,11 @@ function get_divs(element){//function to create a select box of the created divs
 		$("#"+element).empty();
 	}
 	
-	$("#"+element).append('<select id="'+select_id+'">');
+	$("#"+element).prepend('<select id="'+select_id+'">');
 	for (var i=0; i<divs.length; i++) {
 		$("#"+element+" > select").append('<option value="'.concat(divs[i],'">',divs[i],'</option>'));
 	}
-	$("#"+element).append('</select>');
+	$("#"+element+ " > select:last").after('</select>');
 	
 	if (element == "current_divs"){
 		$("#"+element).append('<button type="button" id="fade_toggle_div">Fade Div</button>');
@@ -186,12 +207,12 @@ function get_divs(element){//function to create a select box of the created divs
 		$("#"+element).append('<label for = "div_z_index">z-index (default 1)</label>');
 		$("#"+element).append('<input id = "div_z_index" class="spinner"><br>');
 		$("#"+element).append('<label for = "div_opacity">opacity (default 1)</label>');
-		$("#"+element).append('<input id = "div_opacity" class="spinner">');
+		$("#"+element).append('<input id = "div_opacity" class="spinner"><br>');
 		$("#"+element).append('<span>background color</span>');
 		$("#"+element).append('<div id = "div_bg_color" class="colorpick_div"></div>');
 		spin();
 	} else if (element = "mode") {
-		$("#"+element).append('<button type="button" id="clear_div">Clear Div Content</button>');
+		$("#"+element+" > #"+select_id).after('<button type="button" id="clear_div">Clear Div Content</button>');
 	}
 }
 
@@ -354,6 +375,7 @@ function preview(){
 function update_screen(){ //update current screen selected with the content in the #draw_area
 	//get the device or group
 	var slc_device = $("#device").val();
+	var slc_content = $("#load_content").val();
 	
 	if ($("#device option:selected").text() == "(update all)") {
 		var slc_group = "yes";
@@ -361,84 +383,88 @@ function update_screen(){ //update current screen selected with the content in t
 		var slc_group = "no";
 	}
 	
-	//get the bg color
-	var color = $("#draw_area").css('background-color'); //get the color in rgb(X,Y,Z) pattern
-	
-	var bg_color_split=color.split(","); // split it with ',' keep numbers and convert to integers
-	bg_color_split[0]=parseInt(bg_color_split[0].replace(/\D+/,''),10);
-	bg_color_split[1]=parseInt(bg_color_split[1].replace(/\D+/,''),10);
-	bg_color_split[2]=parseInt(bg_color_split[2].replace(/\D+/,''),10);
-	
-	bg_color_split[0]=bg_color_split[0].toString(16); //convert dec to hex.
-	bg_color_split[1]=bg_color_split[1].toString(16);
-	bg_color_split[2]=bg_color_split[2].toString(16);
-		
-	var bg_color='#'+bg_color_split[0]+bg_color_split[1]+bg_color_split[2]; //concatenate
-	var bg_image = $("#draw_area").css('background-image'); //get the background image
-	var bg_option = $("#bg_img_option").val(); //get background image option (tilled or stretched)
-	//get the inner content
-	var draw_area_data = $("#draw_area").html();
-	
-	$("#hidden_draw_area").empty();
-	$("#hidden_draw_area").append(draw_area_data);
-	
-	$("#hidden_draw_area .video_div").each(function(){
-		var $this = $(this);
-		var links = [];
-		$this.children("p").each(function(ind){
-			links[ind] = $(this).text().match(/=(.*)?/).pop();//get youtube video id
-			//console.log(links[ind]);
-		});
-		var src_string = 'https://www.youtube.com/embed/'+links[0]+'?controls=0&autoplay=1&loop=1&playlist=';
-		
-		if (links.length > 1) {
-			for (var links_id = 1 ; links_id < links.length ; links_id = links_id + 1) {
-				src_string = src_string+links[links_id]+',';
-			}
-			src_string = src_string.substring(0,src_string.length-1); //remove the last comma (,)
-		} else if (links.length == 1) {
-			src_string = src_string+links[0];
+	if (slc_content != "pdm-default00") {
+		//get the bg color
+		var answer = confirm("You are about to push a content named "+slc_content+". Are you sure about this?");
+		if (answer == true) {
+			/*
+			var color = $("#draw_area").css('background-color'); //get the color in rgb(X,Y,Z) pattern
+			
+			var bg_color_split=color.split(","); // split it with ',' keep numbers and convert to integers
+			bg_color_split[0]=parseInt(bg_color_split[0].replace(/\D+/,''),10);
+			bg_color_split[1]=parseInt(bg_color_split[1].replace(/\D+/,''),10);
+			bg_color_split[2]=parseInt(bg_color_split[2].replace(/\D+/,''),10);
+			
+			bg_color_split[0]=bg_color_split[0].toString(16); //convert dec to hex.
+			bg_color_split[1]=bg_color_split[1].toString(16);
+			bg_color_split[2]=bg_color_split[2].toString(16);
+				
+			var bg_color='#'+bg_color_split[0]+bg_color_split[1]+bg_color_split[2]; //concatenate
+			var bg_image = $("#draw_area").css('background-image'); //get the background image
+			var bg_option = $("#bg_img_option").val(); //get background image option (tilled or stretched)
+			//get the inner content
+			var draw_area_data = $("#draw_area").html();
+			
+			$("#hidden_draw_area").empty();
+			$("#hidden_draw_area").append(draw_area_data);
+			
+			$("#hidden_draw_area .video_div").each(function(){
+				var $this = $(this);
+				var links = [];
+				$this.children("p").each(function(ind){
+					links[ind] = $(this).text().match(/=(.*)?/).pop();//get youtube video id
+					//console.log(links[ind]);
+				});
+				var src_string = 'https://www.youtube.com/embed/'+links[0]+'?enablejsapi=1&controls=0&autoplay=1&loop=1&playlist=';
+				
+				if (links.length > 1) {
+					for (var links_id = 1 ; links_id < links.length ; links_id = links_id + 1) {
+						src_string = src_string+links[links_id]+',';
+					}
+					src_string = src_string.substring(0,src_string.length-1); //remove the last comma (,)
+				} else if (links.length == 1) {
+					src_string = src_string+links[0];
+				}
+				$this.empty();
+				var parent_height = $this.parent().css("height");
+				var parent_width = $this.parent().css("width");
+				$this.append("<iframe width='100%' height='100%' src='"+src_string+"' frameborder='0'></iframe>");
+			});
+			
+			$("#hidden_draw_area button").remove();
+			$("#hidden_draw_area h5").remove();
+			$("#hidden_draw_area .ui-resizable-handle").remove();
+			$("#hidden_draw_area .rss_feed > p").remove();
+			$("#hidden_draw_area").children().removeClass(function (index, classes){
+				//classes.match(/slideshow/) || [].join(' ');
+				//classes.match(/rss_feed/) || [].join(' ');
+				classes = classes.replace(/(rss_feed|slideshow|countdown_visibility|clock_visibility|qrcode_layout|qrcode_link)/,' ');//remove all classes except for slideshow, rss_feed etc
+				return classes; 
+			});
+			$("#hidden_draw_area").children().attr("id","");
+			$("#hidden_draw_area > .rss_feed").css("overflow","hidden");
+			$("#hidden_draw_area").children().css("display","block");
+			//$("#hidden_draw_area img").closest("div").addClass("slideshow");
+			//$("#hidden_draw_area").children().attr("id","");
+			
+			draw_area_data = $("#hidden_draw_area").html();
+			//alert(draw_area_data);
+			//var extra_css = convert_css_styles();
+			//alert(extra_css);
+			*/
+			$.ajax({
+				type:"POST",
+				url:"update_screen_db.php",
+				data : {device_name:slc_device,group:slc_group,content:slc_content}
+			})
+			 .done(function(server_echo) {
+				$("#server_return").empty();
+				$("#server_return").append('<span style="background-color:#C1BE2B;">'+server_echo+'</span>');
+			});
 		}
-		$this.empty();
-		var parent_height = $this.parent().css("height");
-		var parent_width = $this.parent().css("width");
-		$this.append("<iframe width='100%' height='100%' src='"+src_string+"' frameborder=0></iframe>");
-	});
-	
-	$("#hidden_draw_area button").remove();
-	$("#hidden_draw_area h5").remove();
-	$("#hidden_draw_area .ui-resizable-handle").remove();
-	$("#hidden_draw_area .rss_feed > p").remove();
-	$("#hidden_draw_area").children().removeClass(function (index, classes){
-		//classes.match(/slideshow/) || [].join(' ');
-		//classes.match(/rss_feed/) || [].join(' ');
-		classes = classes.replace(/(rss_feed|slideshow|countdown_visibility|clock_visibility|qrcode_layout|qrcode_link)/,' ');//remove all classes except for slideshow, rss_feed etc
-		return classes; 
-	});
-	$("#hidden_draw_area").children().attr("id","");
-	$("#hidden_draw_area > .rss_feed").css("overflow","hidden");
-	$("#hidden_draw_area").children().css("display","block");
-	//$("#hidden_draw_area img").closest("div").addClass("slideshow");
-	//$("#hidden_draw_area").children().attr("id","");
-	
-	draw_area_data = $("#hidden_draw_area").html();
-	//alert(draw_area_data);
-	var extra_css = convert_css_styles();
-	//alert(extra_css);
-	
-	$.ajax({
-		type:"POST",
-		url:"update_screen_db.php",
-		data : {device_name:slc_device,data:draw_area_data,bg:bg_color,bg_img:bg_image,bg_opt:bg_option,group:slc_group}
-	})
-	 .done(function(server_echo) {
-		$("#server_return").empty();
-		$("#server_return").append('<span style="background-color:#C1BE2B;">'+server_echo+'</span>');
-	});
-	
-	$("#hidden_draw_area .video_div").each(function(){
-		$(this).empty();
-	});
+	} else {
+		alert("Please select a content");
+	}
 }
 
 $(document).on('click','.close_btn',function(e) { //delete the clicked div when X pressed
@@ -471,7 +497,7 @@ $(document).on('click','.dlt_layout',function() { //delete the clicked layout wh
 
 $(document).on('click','#add_content',function() { //add content in content scheduler
 	var slc_content = $("#select_content").val();
-	$("#current_contents > ol").append('<li><span>'+slc_content+'</span><button class = "remove_scheduled_content">&#10006</button></li>');
+	$("#current_contents > ol").append('<li><span>'+slc_content+'</span><button class = "remove_scheduled_content close_buttons_style">&#10005</button></li>');
 });
 
 $(document).on('click','.remove_scheduled_content',function(){ //remove content from content scheduler
@@ -498,6 +524,11 @@ $(document).on('click','#update_screen_scheduler',function() { //update database
 
 $(document).on('click','#new_btn',function() { //when new layout pressed clear the #draw_area
 	$("#draw_area").empty();
+	$("#draw_area").css({
+		"background-image":"none",
+		"background-color":"#f1f9b8"
+		
+	});
 	i=1;
 	layout_id = 0;
 });
@@ -578,23 +609,48 @@ $(document).on('click','.save_cont_btn',function() { //save content in database
 	$("#hidden_draw_area").empty();
 	$("#hidden_draw_area").append(draw_area_data);
 	
+	$("#hidden_draw_area .video_div").each(function(){
+		/*
+		var $this = $(this);
+		var links = [];
+		$this.children("p").each(function(ind){
+			links[ind] = $(this).text().match(/=(.*)?/).pop();//get youtube video id
+			//console.log(links[ind]);
+		});
+		var src_string = 'https://www.youtube.com/embed/'+links[0]+'?enablejsapi=1&controls=0&autoplay=1&loop=1&playlist=';
+		
+		if (links.length > 1) {
+			for (var links_id = 1 ; links_id < links.length ; links_id = links_id + 1) {
+				src_string = src_string+links[links_id]+',';
+			}
+			src_string = src_string.substring(0,src_string.length-1); //remove the last comma (,)
+		} else if (links.length == 1) {
+			src_string = src_string+links[0];
+		}
+		$this.empty();
+		var parent_height = $this.parent().css("height");
+		var parent_width = $this.parent().css("width");
+		$this.append("<iframe width='100%' height='100%' src='"+src_string+"' frameborder='0'></iframe>");
+		*/
+	});
+	
 	$("#hidden_draw_area button").remove();
 	$("#hidden_draw_area h5").remove();
 	$("#hidden_draw_area .ui-resizable-handle").remove();
-	$("#hidden_draw_area .rss_feed > p").remove();
+	//$("#hidden_draw_area .rss_feed > p").remove();
 	$("#hidden_draw_area").children().removeClass(function (index, classes){
 		classes = classes.replace(/(rss_feed|slideshow|countdown_visibility|clock_visibility|qrcode_layout|weather_script)/,' ');//remove all classes except for slideshow, rss_feed etc
 		return classes; 
 	});
 	$("#hidden_draw_area").children().attr("id","");
-	$("#hidden_draw_area > .rss_feed").css("overflow","hidden");
+	//$("#hidden_draw_area > .rss_feed").css("overflow","hidden");
 	$("#hidden_draw_area").children().css("display","block");
 	//$("#hidden_draw_area img").closest("div").addClass("slideshow");
 	//$("#hidden_draw_area").children().attr("id","");
 	
 	draw_area_data = $("#hidden_draw_area").html();
 	//alert(draw_area_data);
-	var extra_css = convert_css_styles();
+	//var extra_css = convert_css_styles();
 	//alert(extra_css);
 	
 	
@@ -604,9 +660,18 @@ $(document).on('click','.save_cont_btn',function() { //save content in database
 		data : {button:button_pressed,data:draw_area_data,bg_clr:bg_color,bg_img:bg_image,bg_opt:bg_option,content_name:cont_name}
 	})
 	 .done(function(server_echo) {
+		$("#load_content").empty();
+		$("#update_content").empty();
+		
+		load_contents("load_content");
+		load_contents("update_content");
 		$("#server_return").empty();
 		$("#server_return").append('<span style="background-color:#C1BE2B;">'+server_echo+'</span>');
-	}); 
+	});
+	/*
+	$("#hidden_draw_area .video_div").each(function(){
+		$(this).empty();
+	});*/
 });
 
 $(document).on('click','.thub_layout',function(e) { //load a layout from database
@@ -656,18 +721,29 @@ $(document).on('change','#load_content',function(){ //load a content from the da
 			
 			$("#draw_area > div").addClass("draw_div ui-draggable ui-draggable-handle ui-resizable ui-selectee");
 			
-			var div_number = 1;
-			$(".draw_div").each(function() {
-				$(this).attr("id","div"+div_number);
-				div_number = div_number + 1;
-				$(this).append('<h5 class = "div_name">'+$(this).attr("id")+'</h5>');
-			});
 			
-			$(".draw_div").append('<button type="button" class = "close_btn">X</button>');
+			$(".draw_div").prepend('<button type="button" class = "close_btn">X</button>');
 			$(".draw_div").draggable({containment: "parent"});
 
 			$(".ui-resizable-handle").remove();
 			$(".draw_div").resizable({containment: "parent", minHeight:20, minWidth:60});
+			
+			var div_number = 1;
+			$(".draw_div").each(function() {
+				$(this).attr("id","div"+div_number);
+				div_number = div_number + 1;
+				$(this).prepend('<h5 class = "div_name">'+$(this).attr("id")+'</h5>');
+				
+				var images = $(" > img",this).detach(); //must reposition images at the end of parent div.
+				$(this).append(images);
+			});
+			i = div_number;
+			/*
+			$(".draw_div").append('<button type="button" class = "close_btn">X</button>');
+			$(".draw_div").draggable({containment: "parent"});
+
+			$(".ui-resizable-handle").remove();
+			$(".draw_div").resizable({containment: "parent", minHeight:20, minWidth:60}); */
 			
 			$(".clock_visibility").FlipClock({
 				clockFace: 'TwentyFourHourClock',
@@ -753,6 +829,72 @@ function spin(){ //if a input has a spin (up and down button)
 	});
 }
 
+function find_images(elem) { //find images of the selected element
+	$("#image_mode > ol").empty();
+	$(" > img",elem).each(function(){
+		$("#image_mode > ol").append("<li><a href = '"+$(this).attr("src")+"'>"+$(this).attr("src")+"</a><button class = 'remove_image_list close_buttons_style'>&#10005</button></li>")
+	});
+	preview_images();
+}
+
+function preview_images() { //make image thubnail
+	$("#image_mode > ol > li > a").hover(function(e){
+		console.log("mmpika");
+		$("body").append("<p id='preview'><img src='"+this.href+"'></p>");
+		
+		$("#preview")
+			.css("top",(e.pageY - 10) + "px")
+			.css("left",(e.pageX - 30) + "px")
+			.fadeIn("fast");
+		
+	},
+	function(){
+		$("#preview").remove();
+	});
+
+	$("#image_mode > ol > li > a").mousemove(function(e){
+		$("#preview")
+			.css("top",(e.pageY - 10) + "px")
+			.css("left",(e.pageX + 30) + "px");
+	});	
+}
+
+function find_yt_videos(elem) {
+	$("#video_mode > ol").empty();
+	$(" > .video_div > p",elem).each(function(){
+		$("#video_mode > ol").append("<li><a href = '"+$(this).text()+"'>"+$(this).text()+"</a><button class = 'remove_video_list close_buttons_style'>&#10005</button></li>")
+	});
+}
+
+$(document).on('click','.remove_video_list',function(){ //remove a video
+	var slc_div = $("#mydiv").val();
+	
+	var video_pos = $(this).parent("li").index();
+	$(this).parent("li").remove();
+	
+	$('#'+slc_div+" > .video_div > p:eq("+video_pos+")").remove();
+	
+	if ($('#'+slc_div+" > .video_div > p").length == 0) {
+		$('#'+slc_div+" > .video_div").remove();
+	}
+});
+
+$(document).on('click','.remove_image_list',function(){ //remove an image
+	var slc_div = $("#mydiv").val();
+	
+	var img_pos = $(this).parent("li").index();
+	$(this).parent("li").remove();
+	
+	$('#'+slc_div+" > img:eq("+img_pos+")").remove();
+	
+	$('#'+slc_div+" > img").last().css({"width":"100%","height":"100%","max-width":"100%","max-height":"100%","display":"inline"});
+	
+	if ($('#'+slc_div+" > img").length == 1) {
+		$('#'+slc_div).removeClass("slideshow");
+		$('#'+slc_div).removeAttr("data-pduowm-time-rotation");
+	}
+});
+
 $(document).on('click','.show_hide_div',function() { //update custom attributes (data-pduowm-XXXXX) for this div with the date and time this will be visible/hidden
 	var days;
 	var slc_div = $("#manage_div").val();
@@ -781,7 +923,7 @@ $(document).on('click','.show_hide_div',function() { //update custom attributes 
 		}
 	});
 	
-	var rule = '<mark>'+slc_div+' '+$(this).val()+' '+$("#start_date").val()+' '+$("#end_date").val()+' '+$("#start_time").val()+' '+$("#end_time").val()+' '+days+'</mark><button class="edit_rule">Edit</button><button class = "remove_rule">&#10006</button><br>';
+	var rule = '<mark>'+slc_div+' '+$(this).val()+' '+$("#start_date").val()+' '+$("#end_date").val()+' '+$("#start_time").val()+' '+$("#end_time").val()+' '+days+'</mark><button class="edit_rule">&#9998</button><button class = "remove_rule close_buttons_style">&#10005</button><br>';
 	$("#div_rules").append(rule);
 });
 
@@ -822,12 +964,12 @@ $(document).on('change',"#data_form input", function() { //function that create 
 				$("#mode").append('<div id="text_mode" class="tools_menu">');
 					$("#text_mode").append('<textarea id="user_textarea"></textarea>');
 					CKEDITOR.replace('user_textarea');	
-					$("#text_mode").append('<input type="checkbox" name="scroll" class="text_properties">Scrolling text<br>');
+					$("#text_mode").append('<button id="scroll">Toggle Scroll</button><br>');
 				$("#mode").append('</div>');
 			}
 			var ck_editor = CKEDITOR.instances.user_textarea;
 			
-			ck_editor.on('key', function(){
+			ck_editor.on('change', function(){
 				var slc_div = $("#mydiv").val();
 				$("#"+slc_div).not(":has(.show_text)").append('<div class="show_text"></div>');
 				var user_data = ck_editor.getData();
@@ -843,10 +985,26 @@ $(document).on('change',"#data_form input", function() { //function that create 
 					$("#image_mode").append('<button type="button" id ="add_img">Add</button>');
 					$("#image_mode").append('<p>Rotation time in second (Default: 15seconds)</p>');
 					$("#image_mode").append('<input id="time_rotation" type="text" value=""></input>');
+					$("#image_mode").append('<p>List of images</p>');
+					$("#image_mode").append('<ol></ol>');
+					$("#image_mode > ol").sortable({
+						update: function() {
+							var slc_div = $("#mydiv").val();
+							$("#"+slc_div+" > img").remove();
+							$("#image_mode > ol > li > a").each(function(){
+								//console.log($(this).attr("href"));
+								$("#"+slc_div).append("<img src ='"+$(this).attr("href")+"'>");
+								
+								$('#'+slc_div+" > img").css({"width":"100%","height":"100%","max-width":"100%","max-height":"100%","display":"none"});
+								$('#'+slc_div+" > img").last().css({"width":"100%","height":"100%","max-width":"100%","max-height":"100%","display":"inline"});
+							});
+							
+						}
+					});
 				$("#mode").append('</div>');
 			}
 			$("#image_mode").show();
-		} else  if ($("input[name=data_type]:eq(3)").prop("checked")) {
+		} else  if ($("input[name=data_type]:eq(4)").prop("checked")) {
 			$(".tools_menu").hide();
 			if (!$("#rss_mode").length){
 				$("#mode").append('<div id="rss_mode" class="tools_menu">');
@@ -858,7 +1016,7 @@ $(document).on('change',"#data_form input", function() { //function that create 
 				$("#mode").append('</div>');
 			}
 			$("#rss_mode").show();
-		} else if ($("input[name=data_type]:eq(7)").prop("checked")) {
+		} else if ($("input[name=data_type]:eq(8)").prop("checked")) {
 			$(".tools_menu").hide();
 			if (!$("#bg_mode").length){
 				$("#mode").append('<div id="bg_mode" class="tools_menu">');
@@ -879,37 +1037,33 @@ $(document).on('change',"#data_form input", function() { //function that create 
 				$("#mode").append('</div>');
 			}
 			$("#bg_mode").show();
-		} else if ($("input[name=data_type]:eq(5)").prop("checked")){
+		} else if ($("input[name=data_type]:eq(6)").prop("checked")){
 			$(".tools_menu").hide();
 			if (!$("#timer_mode").length){
 				$("#mode").append('<div id="timer_mode" class="tools_menu">');
 					$("#timer_mode").append('<p>Clock</p>');
-					$("#timer_mode").append('<label for="clock24">Show 24H Clock</label>');
-					$("#timer_mode").append('<input type="checkbox" name="show_clock" id="clock24"><br>');
+					$("#timer_mode").append('<button id="clock24">Toggle 24H Clock</button><br>');
 					$("#timer_mode").append('<p>Countdown Timer</p>');
 					$("#timer_mode").append('<p>Select Date and Time</p>');
 					$("#timer_mode").append('<input type="text" class="datepicker input_date_time" id = "countdown_date">');
 					$("#timer_mode").append('<input type="text" class="timepicker input_date_time" id = "countdown_time"><br>');
-					$("#timer_mode").append('<label for="pdm-countdown">Show Countdown Timer</label>');
-					$("#timer_mode").append('<input type="checkbox" name="show_countdown" id="pdm-countdown"><br>');
+					$("#timer_mode").append('<button id="pdm-countdown">Toggle Countdown Timer</button><br>');
 					$("#countdown_date").datepicker({dateFormat:"dd/mm/yy"});
 					$("#countdown_time").timepicker();
 				$("#mode").append('</div>');
 			}
 			$("#timer_mode").show();
-		}else if ($("input[name=data_type]:eq(6)").prop("checked")){
+		}else if ($("input[name=data_type]:eq(7)").prop("checked")){
 			$(".tools_menu").hide();
 			if (!$("#qr_mode").length){
 				$("#mode").append('<div id="qr_mode" class="tools_menu">');
-					$("#qr_mode").append('<label for="layout_qr">Show QR code to change content</label>');
-					$("#qr_mode").append('<input type="checkbox" name="show_layout_qr" id="layout_qr"><br><br>');
+					$("#qr_mode").append('<button id="layout_qr">Toggle QR code to change content</button><br><br>');
 					$("#qr_mode").append('<input type="text" id = "qr_code_link"><br>');
-					$("#qr_mode").append('<label for="link_qr">Custom QR Code</label>');
-					$("#qr_mode").append('<input type="checkbox" name="show_link_qr" id="link_qr"><br>');
+					$("#qr_mode").append('<button id="link_qr">Toggle Custom QR Code</button><br>');
 				$("#mode").append('</div>');
 			}
 			$("#qr_mode").show();
-		}else if ($("input[name=data_type]:eq(8)").prop("checked")){
+		}else if ($("input[name=data_type]:eq(9)").prop("checked")){
 			$(".tools_menu").hide();
 			if (!$("#html_mode").length){
 				$("#mode").append('<div id="html_mode" class="tools_menu">');
@@ -922,43 +1076,80 @@ $(document).on('change',"#data_form input", function() { //function that create 
 			$(".tools_menu").hide();
 			if (!$("#video_mode").length){
 				$("#mode").append('<div id="video_mode" class="tools_menu">');
-					$("#video_mode").append('<p>Insert a youtube link:</p>');
+					$("#video_mode").append('<p>Insert a youtube link or a plain text files with multiple sources:</p>');
 					$("#video_mode").append('<input type="text" id = "video_link">');
 					$("#video_mode").append('<button type="button" id ="add_video">Add</button>');
+					$("#video_mode").append('<p>Delay at start:</p>');
+					$("#video_mode").append('<input type="text" id = "video_delay">');
+					
+					$("#video_mode").append('<p>List of videos</p>');
+					$("#video_mode").append('<ol></ol>');
+					$("#video_mode > ol").sortable({
+						update: function() {
+							var slc_div = $("#mydiv").val();
+							$("#"+slc_div+" .video_div > p").remove();
+							
+							$("#video_mode > ol > li > a").each(function(){
+								$("#"+slc_div+" > .video_div").append("<p>"+$(this).attr("href")+"</p>");
+							});
+						}
+					});
 				$("#mode").append('</div>');
 			}
 			$("#video_mode").show();
-		}else if ($("input[name=data_type]:eq(4)").prop("checked")) {
+		}else if ($("input[name=data_type]:eq(5)").prop("checked")) {
 			$(".tools_menu").hide();
 			if (!$("#weather_mode").length){
 				$("#mode").append('<div id="weather_mode" class="tools_menu">');
 					$("#weather_mode").append('<p>Weather in Thessaloniki</p>');
-					$("#weather_mode").append('<label><span>Show/Hide Weather</span><input type="checkbox" id="weather_plugin" name="show_weather_plugin"></label>');
+					$("#weather_mode").append('<button id="weather_plugin">Toggle Weather</button>');
 					$("#weather_mode").append('<p>(Background div will not be shown)</p>');
 				$("#mode").append('</div>');
 			}
 			$("#weather_mode").show();
+		}else if ($("input[name=data_type]:eq(3)").prop("checked")){
+			$(".tools_menu").hide();
+			if (!$("#audio_mode").length){
+				$("#mode").append('<div id="audio_mode" class="tools_menu">');
+					$("#audio_mode").append('<p>Load a plain text file with mp3s</p>');
+					$("#audio_mode").append('<input type="text" id = "audio_file">');
+					$("#audio_mode").append('<button type="button" id ="add_audio">Add</button><br>');
+					$("#audio_mode").append('<p>We suggest to hide this div</p>');
+					$("#audio_mode").append('<button id = "hide_audio_div">Show/Hide this div</button>');
+					$("#audio_mode").append('<p id = "audio_warning_msg">DIV WILL BE DISPLAYED</p>');
+				$("#mode").append('</div>');
+			}
+			$("#audio_mode").show();
 		}
 	}
 });
 
-$(document).on('change',"#mydiv", function() {//when a div change get the the content of it
+$(document).on('click ',"#mydiv > option", function() {//when a div change get the the content of it
 	$("#div_td").text($("#mydiv").val()); //it will be removed...
 	var slc_div = $("#mydiv").val();
 	$("#textarea").empty();
 	if ($("#"+slc_div).hasClass("rss_feed")){ //if it has RSS
-		$("input:radio[name=data_type]:eq(3)").prop('checked', true); //select the radio
-		$("input:radio[name=data_type]:eq(3)").trigger("change"); //trigger the function. if this line commented it will not change to this radio.
+		$("input:radio[name=data_type]:eq(4)").prop('checked', true); //select the radio
+		$("input:radio[name=data_type]:eq(4)").trigger("change"); //trigger the function. if this line commented it will not change to this radio.
+		
+		var rss_items = $("#"+slc_div).attr("data-pduowm-rss-items");
+		$("#rss_items").val(rss_items);
 	} else if ($("#"+slc_div).children("img").length > 0) { //if it has image
 		$("input:radio[name=data_type]:eq(1)").prop('checked', true); //select the radio
 		$("input:radio[name=data_type]:eq(1)").trigger("change"); //trigger the function. if this line commented it will not change to this radio.
-	} else if ($("#"+slc_div).children(".show_text").length > 0){ //if it is a text
+		
+		if ($("#"+slc_div).hasClass("slideshow")) {
+			$("#time_rotation").val($("#"+slc_div).attr("data-pduowm-time-rotation"));
+		}
+		
+		find_images($("#"+slc_div));
+	} else if ($("#"+slc_div).find(".show_text").length > 0){ //if it is a text
 		$("input:radio[name=data_type]:eq(0)").prop('checked', true); //select the radio
 		$("input:radio[name=data_type]:eq(0)").trigger("change"); //trigger the function. if this line commented it will not change to this radio.
-		CKEDITOR.instances['user_textarea'].setData($("#"+slc_div+" > .show_text").html());
+		CKEDITOR.instances['user_textarea'].setData($("#"+slc_div+" .show_text").html());
 	} else if ($("#"+slc_div).children(".clock_visibility").length > 0) { //if it has a clock
-		$("input:radio[name=data_type]:eq(5)").prop('checked', true);
-		$("input:radio[name=data_type]:eq(5)").trigger("change");
+		$("input:radio[name=data_type]:eq(6)").prop('checked', true);
+		$("input:radio[name=data_type]:eq(6)").trigger("change");
 		$("#clock24").prop('checked', true);
 	} else if ($("#"+slc_div).children(".countdown_visibility").length > 0) { //if it has a countdown timer
 		var inputDate = new Date($("#"+slc_div+" > .countdown_visibility").attr("data-pduowm-ct-date"));
@@ -979,34 +1170,35 @@ $(document).on('change',"#mydiv", function() {//when a div change get the the co
 		var user_countdown_date = user_date+'/'+user_month+'/'+user_year;
 		var user_countdown_time = user_hour+':'+user_minutes;
 		
-		$("input:radio[name=data_type]:eq(5)").prop('checked', true);
-		$("input:radio[name=data_type]:eq(5)").trigger("change");
-		$("#pdm-countdown").prop('checked', true);
+		$("input:radio[name=data_type]:eq(6)").prop('checked', true);
+		$("input:radio[name=data_type]:eq(6)").trigger("change");
 		
 		$("#countdown_date").val(user_countdown_date);
 		$("#countdown_time").val(user_countdown_time);
 	} else if ($("#"+slc_div).children(".qrcode_layout").length > 0 || $("#"+slc_div).children(".qrcode_link").length > 0) { //if a qrcode for content selection
-		$("input:radio[name=data_type]:eq(6)").prop('checked', true);
-		$("input:radio[name=data_type]:eq(6)").trigger("change");
-		
-		if ($("#"+slc_div).children(".qrcode_layout").length > 0) {
-			$("#layout_qr").prop('checked', true);
-		}
-		if ($("#"+slc_div).children(".qrcode_link").length > 0) {
-			$("#link_qr").prop('checked', true);
-		}
+		$("input:radio[name=data_type]:eq(7)").prop('checked', true);
+		$("input:radio[name=data_type]:eq(7)").trigger("change");
 	} else if ($("#"+slc_div).children(".pure_html").length > 0) { //if it has html
-		$("input:radio[name=data_type]:eq(8)").prop('checked', true);
-		$("input:radio[name=data_type]:eq(8)").trigger("change");
+		$("input:radio[name=data_type]:eq(9)").prop('checked', true);
+		$("input:radio[name=data_type]:eq(9)").trigger("change");
 		$("#html_textarea").val($("#"+slc_div+" > .pure_html").html());
 	} else if ($("#"+slc_div).children(".video_div").length > 0) {
 		$("input:radio[name=data_type]:eq(2)").prop('checked', true);
 		$("input:radio[name=data_type]:eq(2)").trigger("change");
 		
-	}else if ($("#"+slc_div).children(".weather_script").length > 0) {
-		$("input:radio[name=data_type]:eq(4)").prop('checked', true);
-		$("input:radio[name=data_type]:eq(4)").trigger("change");
-		$("#weather_plugin").prop('checked', true);
+		find_yt_videos($("#"+slc_div));
+	} else if ($("#"+slc_div).children(".weather_script").length > 0) {
+		$("input:radio[name=data_type]:eq(5)").prop('checked', true);
+		$("input:radio[name=data_type]:eq(5)").trigger("change");
+	} else if ($("#"+slc_div).children(".audio_div").length > 0) {
+		$("input:radio[name=data_type]:eq(3)").prop('checked', true);
+		$("input:radio[name=data_type]:eq(3)").trigger("change");
+		
+		if ($("#"+slc_div+" > .audio_div").hasClass("hidden_player")) {
+			$("#audio_warning_msg").text("DIV WILL NOT BE DISPLAYED.");
+		} else {
+			$("#audio_warning_msg").text("DIV WILL BE DISPLAYED.");
+		}
 	}
 });
 
@@ -1036,6 +1228,45 @@ $(document).on('click','#clear_div',function() { //clear div content and make it
 	$('#'+slc_div+' > .weather_script').remove(); //remove weather
 });
 
+$(document).on('click', "#add_audio", function(){ //add a audio file
+	var slc_div = $("#mydiv").val();
+	var audio_list = $("#audio_file").val();
+	
+	$.ajax({
+		type:"POST",
+		url:"get_media_files.php",
+		data : {file:audio_list}
+	})
+	 .done(function(server_echo) {
+		if (server_echo != "File not loaded.") {
+			if (!$("#"+slc_div+" > .audio_div").length) {
+				$("#"+slc_div).append('<div class="audio_div"></div>');
+				$('#'+slc_div+" > .audio_div").append(server_echo);
+			}
+		} else {
+			$('#server_return').empty();
+			$('#server_return').append(server_echo);
+		}
+		
+	 });
+	
+	
+});
+
+$(document).on('click',"#hide_audio_div",function(){
+	var slc_div = $("#mydiv").val();
+	if ($("#"+slc_div+" > .audio_div").length > 0) {
+		if (!$("#"+slc_div+" > .audio_div").hasClass("hidden_player")) {
+			$("#"+slc_div+" > .audio_div").addClass("hidden_player");
+			$("#audio_mode > #audio_warning_msg").text("DIV WILL NOT BE DISPLAYED.");
+			
+		} else {
+			$("#"+slc_div+" > .audio_div").removeClass("hidden_player");
+			$("#audio_mode > #audio_warning_msg").text("DIV WILL BE DISPLAYED.");
+		}
+	}
+});
+
 $(document).on('click', "#add_video", function(){ //add youtube video to div. NO VIDEO WILL BE PLAYED DURING LAYOUT DESIGN. IT WILL PLAY IN THE SCREEN.
 	var slc_div = $("#mydiv").val();
 	var yt_link = $("#video_link").val();
@@ -1044,11 +1275,29 @@ $(document).on('click', "#add_video", function(){ //add youtube video to div. NO
 	if (yt_link != null) {
 		var isyoutube = yt_link.match(/youtube.com\/watch\?v=/i);
 		if (isyoutube == null) {
-			alert("Please provide a valid youtube link.");
+			//alert("Please provide a valid youtube link.");
+			$.ajax({
+				type:"POST",
+				url:"get_media_files.php",
+				data : {file:yt_link}
+			})
+			 .done(function(server_echo) {
+				if (server_echo != "File not loaded.") {
+					if (!$("#"+slc_div+" > .video_div").length) {
+						$("#"+slc_div).append('<div class="video_div"></div>');
+						$('#'+slc_div+" > .video_div").append(server_echo);
+					}
+				} else {
+					$('#server_return').empty();
+					$('#server_return').append(server_echo);
+				}
+				
+			 });
 		} else {
 			if (!$("#"+slc_div+" > .video_div").length) {
 				$("#"+slc_div).append('<div class="video_div"></div>');
-				$('#'+slc_div+' > .video_div').css({"width":"100%","height":"100%"});
+				$('#'+slc_div+' > .video_div').css({"width":"100%"});
+				$('#'+slc_div+' > .video_div').attr({"data-pduowm-video-delay":$("#video_delay").val()});
 			}
 			$('#'+slc_div+' > .video_div').append("<p>"+yt_link+"</p>");
 		}
@@ -1058,7 +1307,9 @@ $(document).on('click', "#add_video", function(){ //add youtube video to div. NO
 
 $(document).on('click', "#link_qr", function(){ //create a QR with a custom text
 	var slc_div = $("#mydiv").val();
-	if ($("input[name=show_link_qr]").is(":checked")){
+	if ($('#'+slc_div).children(".qrcode_link").length > 0) {
+		$('#draw_area > #'+slc_div+' > .qrcode_link').remove();
+	} else {
 		$("#draw_area > #"+slc_div).append('<div class = "qrcode_link" id = "'+slc_div+'_qrlink"</div>');
 		
 		var qrcode = new QRCode(document.getElementById(slc_div+"_qrlink"), {
@@ -1067,15 +1318,16 @@ $(document).on('click', "#link_qr", function(){ //create a QR with a custom text
 			height:100,
 			correctLevel : QRCode.CorrectLevel.H
 		});
-	} else {
-		$('#draw_area > #'+slc_div+' > .qrcode_link').remove();
 	}
 });
 
 
 $(document).on('click', "#layout_qr", function(){ //create a QR for user interaction in order to change content for this screen
 	var slc_div = $("#mydiv").val();
-	if ($("input[name=show_layout_qr]").is(":checked")){
+	
+	if ($('#'+slc_div).children(".qrcode_layout").length > 0) {
+		$('#draw_area > #'+slc_div+' > .qrcode_layout').remove();
+	} else {
 		$('#draw_area > #'+slc_div).append('<div class = "qrcode_layout" id = "'+slc_div+'_qr"</div>');
 					
 		var qrcode = new QRCode(document.getElementById(slc_div+"_qr"), {
@@ -1084,14 +1336,15 @@ $(document).on('click', "#layout_qr", function(){ //create a QR for user interac
 			height : 100,
 			correctLevel : QRCode.CorrectLevel.H
 		});
-	} else {
-		$('#draw_area > #'+slc_div+' > .qrcode_layout').remove();
 	}
 });
 
 $(document).on('click', "#weather_plugin", function(){ //add a weather plugin
 	var slc_div = $("#mydiv").val();
-	if ($("input[name=show_weather_plugin]").is(":checked")){
+	
+	if ($('#'+slc_div).children(".weather_script").length > 0) {
+		$('#draw_area > #'+slc_div+' > .weather_script').remove();
+	} else {
 		$("#draw_area > #"+slc_div).append('<div class = "weather_script"><iframe id="BD1E4C55-94F2-412A-81F8-FD2D93EB88E4" scrolling="no" frameborder="0" width="300" height="235" src=""></iframe><a target="_blank" style="display: block; text-decoration: underline; font: 10px/10px Arial,san-serif; color: rgb(119, 119, 119);" href="http://www.deltiokairou.gr/?widget_type=square">Καιρός σήμερα και πρόγνωση καιρού για κάθε περιοχή</a></div>');
 		
 		$.getScript("http://service.24media.gr/js/deltiokairou_widget.js", function(){
@@ -1102,23 +1355,21 @@ $(document).on('click', "#weather_plugin", function(){ //add a weather plugin
 		});
 		
 		$('#draw_area > #'+slc_div+' > .weather_script').append(script);
-	} else {
-		$('#draw_area > #'+slc_div+' > .weather_script').remove();
 	}
-	
 });
 
 $(document).on('click', "#clock24", function(){ //display a 24H clock
 	var slc_div = $("#mydiv").val();
-	if ($("input[name=show_clock]").is(":checked")){
+	
+	if ($('#'+slc_div).children(".clock_visibility").length > 0) {
+		$('#draw_area > #'+slc_div+' > .clock_visibility').remove();
+	} else {
 		$('#draw_area > #'+slc_div).append('<div class="clock_visibility"></div>');
 		
 		$('#draw_area > #'+slc_div+' > .clock_visibility').FlipClock({
 			clockFace: 'TwentyFourHourClock',
 			showSeconds: false
 		});
-	} else {
-		$('#draw_area > #'+slc_div+' > .clock_visibility').remove();
 	}
 });
 
@@ -1131,7 +1382,10 @@ $(document).on('click', "#pdm-countdown", function(){ //display a countdown time
 	if (ct_day != "" && ct_time != "") {
 		splitted_day = ct_day.split("/");
 		ct_day = splitted_day[2]+'/'+splitted_day[1]+'/'+splitted_day[0]; //we reverse the day to pass it in Date() object because it accepts arguments in yyyy/mm/dd format.
-		if ($("input[name=show_countdown]").is(":checked")){
+		
+		if ($('#'+slc_div).children(".countdown_visibility").length > 0) {
+			$('#draw_area > #'+slc_div+' > .countdown_visibility').remove();
+		} else {
 			var userDate = new Date(ct_day+' '+ct_time);
 			var currentDate = new Date();
 			var diff = userDate.getTime() / 1000 - currentDate.getTime() / 1000; //calculate the difference of the dates in seconds
@@ -1141,8 +1395,6 @@ $(document).on('click', "#pdm-countdown", function(){ //display a countdown time
 				clockFace: 'DailyCounter',
 				countdown: true
 			});
-		} else {
-			$('#draw_area > #'+slc_div+' > .countdown_visibility').remove();
 		}
 	} else {
 		alert("You forgot something..."); 
@@ -1188,6 +1440,8 @@ $(document).on('click', "#add_img", function(){ //add an image or more to a div
 	$('#'+slc_div).append(url);
 	$('#'+slc_div+" > img").css({"width":"100%","height":"100%","max-width":"100%","max-height":"100%","display":"none"});
 	$('#'+slc_div+" > img").last().css({"width":"100%","height":"100%","max-width":"100%","max-height":"100%","display":"inline"});
+	
+	find_images($('#'+slc_div));
 });
 
 $(document).on('focusout', "#time_rotation", function(){ //update image time rotation
@@ -1203,7 +1457,9 @@ $(document).on('click', "#add_rss", function(){ //add an RSS updater to the div.
 	var url=$("#rss_url").val();
 	$('#'+slc_div).addClass("rss_feed");
 	$('#'+slc_div).attr("data-pduowm-rss",url);
-	$('#'+slc_div).append("<p>RSS :"+url+" </p>");
+	$('#'+slc_div).append("<p>RSS : "+url+" </p>");
+	var items = ($("#rss_items").val() > 1) ? $("#rss_items").val() : 1;
+	$('#'+slc_div).attr("data-pduowm-rss-items",items);
 });
 
 $(document).on('focusout', "#rss_items", function(){ //set how many items it will be displayed in an RSS
@@ -1223,10 +1479,12 @@ $(document).on('focusout', "#html_textarea", function(){ //append pure HTML code
 	$("#"+slc_div+" > .pure_html").append(html_code);
 });
 
-$(document).on('click','.text_properties',function(){ //make a text scrolling or not
+$(document).on('click','#scroll',function(){ //make a text scrolling or not
 	var write_div = $("#mydiv").val();
 	
-	if($("input[name=scroll]").is(":checked")){
+	$('#'+write_div+" > .show_text").toggleClass("scrolling_text");
+	
+	if ($('#'+write_div+" > .show_text").hasClass("scrolling_text")) {
 		$("#"+write_div+" > .show_text").addClass("scrolling_text");
 		$("#"+write_div+" > .show_text").wrap("<div></div>");
 		$("#"+write_div+" > div").css("overflow","hidden");
@@ -1249,9 +1507,10 @@ $(document).on('click','.text_properties',function(){ //make a text scrolling or
 $(function() { //main function
 	draw();
 	load_layouts();
+	load_contents("load_content");
+	load_contents("update_content");
 	$(".datepicker").datepicker({dateFormat:"dd/mm/yy"});
 	$(".timepicker").timepicker();
-	
 	$("#lay_but").click(function(){
 		$(".options_menu").hide();
 		$("#saved_layouts").fadeToggle(100);

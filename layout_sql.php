@@ -119,7 +119,7 @@ if ($_POST['button']=="save_btn" && isset($_SESSION['admin'])) //called by layou
 		echo "An error occured. Please try again.";
 	}
 	
-} else if ($_POST['button']=="layouts" && isset($_SESSION['admin']))
+} else if ($_POST['button']=="layouts" && isset($_SESSION['admin'])) // load layouts thubs
 {
 	$sql_query=$conn->prepare("SELECT COUNT(*) FROM layouts");
 	$sql_query->execute();
@@ -146,6 +146,26 @@ if ($_POST['button']=="save_btn" && isset($_SESSION['admin'])) //called by layou
 		$result = $sql_query->fetchAll();
 		echo json_encode($result);
 	}
+} else if  ($_POST['button']=="contents" && isset($_SESSION['admin'])){ //load contents name in select menu
+	if ($_SESSION['admin']=="root"){
+		$sql_query=$conn->prepare("SELECT name FROM contents");
+		$sql_query->execute();
+	} else {
+		$sql_query=$conn->prepare("SELECT id FROM users_information WHERE username = ?");
+		$sql_query->bindParam(1,$_SESSION['admin']);
+		$sql_query->execute();
+		$user_id = $sql_query->fetch();
+		
+		$sql_query=$conn->prepare("SELECT name FROM contents WHERE user_id=?");
+		$sql_query->bindParam(1,$user_id['id']);
+		$sql_query->execute();
+	}
+	$result = $sql_query->fetchAll();
+	/*foreach ($result as $row) {
+		print '<option value = "'.$row['0'].'">'.$row[0].'</option>';
+	}*/
+	echo json_encode($result);
+	
 } else {
 	echo "An error occured. You have probably signed out. Please re-login and try again.";
 }

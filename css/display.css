@@ -18,3 +18,14 @@ html {
 	color: blue;
 	font-size:3em;
 }
+
+.video_div{
+	height:100%;
+}
+
+video{
+	min-width: 100%; 
+    min-height: 100%;
+    width: inherit; 
+    height: inherit;
+}

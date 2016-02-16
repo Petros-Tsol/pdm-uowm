@@ -3,6 +3,10 @@
 	background-color:#A9FFFF;
 }
 
+#results .active_groups{
+	white-space:nowrap;
+}
+
 #results > table td,th{
 	border:1px solid black;
 	text-align: center;
@@ -35,4 +39,8 @@
 	margin-right:auto;
 	margin-top:10px;
 	text-align:center;
-}		
+}
+
+.error_msg{
+	float:none !important;
+}

@@ -4,15 +4,29 @@
 	margin-left:auto;
 	margin-right:auto;
 	margin-top:4em;
-	width:16em;
+	width:17em;
 	background-color:#A9FFFF;
 	padding:2em;
 }
 
-.form_design > h1 {
-	margin:0px 0px 20px 0px;
+
+.form_design h1 {
+	margin-bottom:20px;
+	margin-left:auto;
+	margin-right:auto;
 	font-size:30px;
 	text-align:center;
+}
+
+.form_design textarea{
+	margin-left:3em;
+	margin-bottom:13px;
+	width:196px;
+	height:85px;
+	border:1px solid #DBDBDB;
+	text-align:left;
+	padding:0 !important;
+	resize:none;
 }
 
 .form_design > form > label > input, .form_design > label > input{
@@ -21,6 +35,12 @@
 	height:20px;
 	border:1px solid #DBDBDB;
 	text-align:left;
+	margin-bottom:13px;
+}
+
+.form_design > form > label > select{
+	width:196px;
+	margin-left:3em;
 	margin-bottom:13px;
 }
 
@@ -43,7 +63,9 @@
 .error_msg{
 	background-color : #E53023;
 	margin-left:2.6em;
-	white-space:nowrap;
+	width:196px;
+	float:left;
+	margin-bottom:10px;
 }
 
 .success{

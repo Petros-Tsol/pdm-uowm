@@ -29,8 +29,10 @@
 		include 'cp_header.php';
 		include 'cp_side.php';
 	?>
-<h3 id ="welcome_msg">Welcome to UOWM Public Display Management.</h3>
+<h3 id ="welcome_msg">Welcome to UOWM Public Display Management</h3>
+
 	
+
 	<?php include 'footer.php'; ?>
 </body>
 </html>

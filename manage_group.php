@@ -1,6 +1,6 @@
 <?php
 	session_start();
-	if (!isset($_SESSION['admin']))
+	if ((!isset($_SESSION['admin'])) || ($_SESSION['admin'] != "root"))
 	{
 		header('Location: login_page.php');
 	}
@@ -33,8 +33,12 @@
 	require_once('connect2db');
 				
 	$conn=connect_db($host,$db,$db_user,$db_pass);
+	
+	if (isset($_GET['group'])) {
+		$selected_group = filter_var($_GET['group'],FILTER_SANITIZE_STRING,FILTER_FLAG_STRIP_LOW);
+	}
 
-	$sql_query=$conn->prepare("SELECT description FROM groups");
+	$sql_query=$conn->prepare("SELECT name FROM groups");
 	$sql_query->execute();
 	$result=$sql_query->fetchAll();
 	
@@ -42,39 +46,46 @@
 		print '<h1>Update Group</h1>';
 		print "<select id= 'groups'>";
 		foreach ($result as $key=>$row) {
-			if ($key > 0) {
-				print '<option>'.$row['description'].'</option>';
+			//if ($key > 0) {
+				//print '<option>'.$row['description'].'</option>';
+			//} else {
+				//print '<option selected>'.$row['description'].'</option>';
+			//}
+			if (isset($selected_group) && $row['name']==$selected_group) {
+				print '<option selected>'.$row['name'].'</option>';
 			} else {
-				print '<option selected>'.$row['description'].'</option>';
+				print '<option>'.$row['name'].'</option>';
 			}
 		}
-		print'</select><br>';
+		print'</select>';
+		print '<button id = "upd_group" class="submit_btn">Update</button>';
 		
-			$sql_query=$conn->prepare("SELECT username FROM users_information");
-			$sql_query->execute();
-			$result=$sql_query->fetchAll();
-			print '<div id ="users">';
-			print '<h3>Users</h3>';
-			foreach ($result as $row) {
-				print '<label>';
-				print '<input type="checkbox" name="user" value="'.$row['username'].'">'.$row['username'].'<br>';
-				print '</label>';
-			}
-			print '</div>';
-			
-			$sql_query=$conn->prepare("SELECT name FROM screens");
-			$sql_query->execute();
-			$result=$sql_query->fetchAll();
-			print '<div id ="screens">';
-			print '<h3>Screens</h3>';
-			foreach ($result as $row) {
-				print '<label>';
-				print '<input type="checkbox" name="screen" value="'.$row['name'].'">'.$row['name'].'<br>';
-				print '</label>';
-			}
-			print '</div>';
-			print '<button id = "upd_group" class="submit_btn">Update</button>';
-			print '<div id = "success_msg"></div>';
+		$sql_query=$conn->prepare("SELECT username FROM users_information WHERE username <> ?");
+		$sql_query->bindValue(1,"root");
+		$sql_query->execute();
+		$result=$sql_query->fetchAll();
+		print '<div id ="users">';
+		print '<h3>Users</h3>';
+		foreach ($result as $row) {
+			print '<label>';
+			print '<input type="checkbox" name="user" value="'.$row['username'].'">'.$row['username'].'<br>';
+			print '</label>';
+		}
+		print '</div>';
+		
+		$sql_query=$conn->prepare("SELECT name FROM screens");
+		$sql_query->execute();
+		$result=$sql_query->fetchAll();
+		print '<div id ="screens">';
+		print '<h3>Screens</h3>';
+		foreach ($result as $row) {
+			print '<label>';
+			print '<input type="checkbox" name="screen" value="'.$row['name'].'">'.$row['name'].'<br>';
+			print '</label>';
+		}
+		print '</div>';
+		
+		print '<div id = "success_msg"></div>';
 	print '</div>';
 	
 	

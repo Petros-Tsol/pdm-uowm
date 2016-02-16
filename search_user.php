@@ -1,6 +1,6 @@
 <?php
 	session_start();
-	if (!isset($_SESSION['admin']))
+	if ((!isset($_SESSION['admin'])) || ($_SESSION['admin'] != "root"))
 	{
 		header('Location: login_page.php');
 	}
@@ -47,8 +47,8 @@ $conn=connect_db($host,$db,$db_user,$db_pass);
 
 if (isset($_POST['search_db'])){
 	
-	$crit=$_POST['crit']."%";
-	$sql_query=$conn->prepare("SELECT username, fname, lname, email FROM users_information WHERE username LIKE ? OR lname LIKE ? OR fname LIKE ?");
+	$crit="%".$_POST['crit']."%";
+	$sql_query=$conn->prepare("SELECT username, fname, lname, email,id FROM users_information WHERE username LIKE ? OR lname LIKE ? OR fname LIKE ?");
 	$sql_query->bindParam(1,$crit);
 	$sql_query->bindParam(2,$crit);
 	$sql_query->bindParam(3,$crit);
@@ -63,10 +63,22 @@ if (isset($_POST['search_db'])){
 			print '<th>'."First Name".'</th>';
 			print '<th>'."Last Name".'</th>';
 			print '<th>'."E-mail".'</th>';
+			print '<th>'."Groups".'</th>';
 			print '<th>'."Modify".'</th>';
 		print "</tr>";
 		$i=1;
 		foreach ($result as $row){
+			$sql_query=$conn->prepare("SELECT name FROM groups JOIN users_privileges ON users_privileges.group_id = groups.id AND users_privileges.user_id = ?");
+			$sql_query->bindParam(1,$row[4]);
+			$sql_query->execute();
+			$groups = $sql_query->fetchAll();
+			
+			$groups_url = "";
+			for ($j=0;$j<count($groups);$j=$j+1) {
+				$src = "manage_group.php?group=".urlencode($groups[$j][0]);
+				$groups_url = $groups_url.'<a href="'.$src.'">'.$groups[$j][0].'</a><br>';
+			}
+			
 			$tmp = 'id'.$i; //id of user
 			$tmp2 = $tmp.'b'; //id of button
 			print "<tr>";
@@ -74,6 +86,7 @@ if (isset($_POST['search_db'])){
 			print '<td>'.$row[1].'</td>';
 			print '<td>'.$row[2].'</td>';
 			print '<td>'.$row[3].'</td>';
+			print '<td class="active_groups">'.$groups_url.'</td>';
 			print '<td>'.'<button class = "submit_btn" id="'.$tmp2.'" onclick="pass_data(this.id);">Press</button>'.'</td>';
 			print "</tr>";
 			$i=$i+1;

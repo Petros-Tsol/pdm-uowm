@@ -1,4 +1,10 @@
-//THE FIRST TWO FUNCTIONS TAKE PLACE BEFORE WE INSTALL A COOKIE FOR THIS SCREEN
+var tag = document.createElement('script');
+
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+//THE FIRST FOUR FUNCTIONS TAKE PLACE BEFORE WE SET A COOKIE FOR THIS SCREEN
 
 function getCookie(cname) { //this function can be found here : http://www.w3schools.com/js/js_cookies.asp
     var name = cname + "=";
@@ -9,25 +15,41 @@ function getCookie(cname) { //this function can be found here : http://www.w3sch
         if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
     }
     return "";
+}
+
+function ajax_call(screen) {
+	$.ajax({
+		type: "POST",
+		url: "update_screen_db.php",
+		data : {name:screen}
+	})
+	 .done(function(server_echo) {
+		if (server_echo == "ok") { 
+			window.location.replace("/pd_uowm/redirect.html");
+			//redirect to redirect.html because of the cookie
+		}else if(server_echo == "redirect") {
+			window.location.replace("/pd_uowm/display.php");
+		} else {
+			alert(server_echo);
+		}
+	});
 } 
+
+function provided_screen() {
+	var url = window.location.href; //get url, the url must be in pattern like display.php?screen=something
+	var regex = /display\.php\?screen=(.*)/; //regular expression to get screen name 
+	var screen = regex.exec(url);
+	
+	if (screen != null) { //if a screen has been typed
+		ajax_call(screen[1]);
+	}
+}
 
 
 $(document).on('click','button',function() { //when install button clicked.
 	var screen = $("#screen").val();
 	if (screen != null){
-		$.ajax({
-			type: "POST",
-			url: "update_screen_db.php",
-			data : {name:screen}
-		})
-		 .done(function(server_echo) {
-			if (server_echo = "ok") { 
-				window.location.replace("/pd_uowm/redirect.html");
-				//redirect to redirect.html because of the cookie
-			} else {
-				alert(server_echo);
-			}
-		});
+		ajax_call(screen);
 	}
 	
 });
@@ -42,6 +64,8 @@ function image_rotation(object,ind) { //rotate images
 function rss_update(){ //load rss link
 	$(".rss_feed").each(function(){
 		//console.log($(this).attr("data-pduowm-rss-items"));
+		$(" > p",this).remove();
+		$(this).css("overflow","hidden");
 		$(this).load("rss_update.php",{url:$(this).attr("data-pduowm-rss"),items:$(this).attr("data-pduowm-rss-items")});
 	});
 }
@@ -132,15 +156,67 @@ function init_qrcode(qr_un_id){ //set a qrcode to change layout
 	});
 }
 
+function playlist(elem,list,type) { //elem : a div with class .audio_div, list:songs
+	var current = 0;
+	if (type == "audio") {
+		$(" > audio",elem)[0].volume = 1; //max sound
+		
+		current  = playsong(current,list,elem);
+		
+		$(" > audio",elem)[0].addEventListener('ended',function(e){ //if a song has ended
+			if (current == list.length - 1) { // start from the beginning if current reached track length.
+				current = 0;
+			}
+			current = playsong(current,list,elem);
+		});
+	} else if (type == "video") {
+		$(" > video",elem)[0].volume = 1; //max sound
+		
+		current  = playsong(current,list,elem,type);
+		
+		$(" > video",elem)[0].addEventListener('ended',function(e){ //if a video has ended
+			if (current == list.length - 1) { // start from the beginning if current reached track length.
+				current = 0;
+			}
+			current = playsong(current,list,elem,type);
+		});
+	}
+}
+
+function playsong(current,list,elem,type) { //current: current index of songs. list:list of songs. elem: a div with class .audio_div
+	if (type == "audio") {	
+		do {
+			var file_type = list[current].slice(-3); //get the last three characters
+			current++; //go to the next entry
+		} while (file_type != "mp3" && file_type != "ogg" && file_type != "wav" && current == list.length);
+		
+		$(" > audio",elem)[0].src = list[current - 1]; // current has been already increased, we need the previous index
+		$(" > audio",elem)[0].play();
+		return current;
+	} else if (type == "video") {
+		do {
+			var file_type = list[current].slice(list[current].lastIndexOf(".")+1); //get file type
+			current++; //go to the next entry
+		} while (file_type != "mp4" && file_type != "ogg" && file_type != "webm" && current == list.length);
+		
+		$(" > video",elem)[0].src = list[current - 1]; // current has been already increased, we need the previous index
+		$(" > video",elem)[0].play();
+		return current;
+	}
+}
 
 $(function() {
-	if (getCookie("dev_id") != ""){ //connect to server to get new data.
+	if (getCookie("dev_id") == "") {
+		provided_screen();
+	} else { //connect to server to get new data.
 		if(typeof(EventSource) !== "undefined") {
 			var source = new EventSource("update_screen.php");		
 			source.onmessage = function(event) {
 				var data = JSON.parse(event.data);
-				//console.log(data);
-				if (data.html == "NOMOREDATA") { //close the connection when cookie expires
+				console.log(data);
+				if (data == null) { //if no content is defined
+					$("body").empty();
+				} else if (data.html == "NOMOREDATA") { //close the connection when cookie expires
 					source.close();
 				} else if (data != "0") { //every X sec (X is the time we receive new data) an 0 is sent from the server to close the inactive connections. the client should not accept it.
 					$("body").empty();
@@ -177,6 +253,8 @@ $(function() {
 					div_visibility();
 					rss_update();
 					
+					
+					
 					$(".slideshow").each(function(){
 						var elem = $(this);
 						elem.find("img").css({"width":"100%","height":"100%","display":"inline"});
@@ -208,7 +286,63 @@ $(function() {
 						});
 					});
 					
+					$(".video_div").each(function(){
+						if ($(this).has("p").length) {
+							var $this = $(this);
+							var links = [];
+							$this.children("p").each(function(ind){
+								links[ind] = $(this).text().match(/=(.*)?/).pop();//get youtube video id
+							});
+							//console.log(links);
+							var src_string = 'https://www.youtube.com/embed/'+links[0]+'?enablejsapi=1&controls=0&autoplay=1&loop=1&playlist=';
+							
+							if (links.length > 1) {
+								for (var links_id = 1 ; links_id < links.length ; links_id = links_id + 1) {
+									src_string = src_string+links[links_id]+',';
+								}
+								src_string = src_string.substring(0,src_string.length-1); //remove the last comma (,)
+							} else if (links.length == 1) {
+								src_string = src_string+links[0];
+							}
+							$this.empty();
+							var parent_height = $this.parent().css("height");
+							var parent_width = $this.parent().css("width");
+							$this.append("<iframe width='100%' height='100%' src='"+src_string+"' frameborder='0'></iframe>");
+							
+							
+							var myvideo=$(this);
+							var player = new YT.Player($(' > iframe',this).get(0),{
+								events:{
+									'onReady':function(event) {
+										if (myvideo.attr("data-pduowm-video-delay")!=null){
+											event.target.pauseVideo(); //pause video at start;
+											setTimeout(function(){event.target.playVideo();},myvideo.attr("data-pduowm-video-delay")*1000);//start it X*1000 (must be converted to millisec)
+										}
+									}
+								}
+							});
+						} else {
+							var video_div =$(this);
+							var videos = $(this).text().split('\n')
+							//console.log(videos);
+							
+							video_div.empty(); //delete videos
+							video_div.append("<video preload='auto' tabindex='0' controls=''><source></source></video>"); //append a html5 video tag
+							playlist(video_div,videos,"video");
+						}
+					});
 					
+					$(".audio_div").each(function(){
+						if ($(this).hasClass("hidden_player")) {
+							$(this).parent().css({"visibility":"hidden"});
+						}
+						
+						var music_div = $(this);
+						var songs = ($(this).text().split('\n')); //get songs
+						music_div.empty(); //delete songs
+						music_div.append("<audio preload='auto' tabindex='0' controls=''><source></source></audio>"); //append a html5 audio tag
+						playlist(music_div,songs,"audio");
+					});
 				}
 			}
 		} else {
@@ -221,3 +355,7 @@ $(function() {
 	//setInterval(rss_update,100000);
 	//window.onload = div_visibility;
 });
+
+window.onYouTubePlayerAPIReady = function(){
+	
+}

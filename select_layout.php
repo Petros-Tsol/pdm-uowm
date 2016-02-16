@@ -48,7 +48,7 @@
 <body>
 	<div id = "layout_menu">
 		<div id = "menu_title">
-			<span>Select a layout for this screen</span>
+			<h3>Select a content for this screen</h3>
 		</div>
 		
 		<div id = "menu_items">
@@ -60,34 +60,44 @@
 					require_once('connect2db');
 					require_once('rng.php');
 					$conn=connect_db($host,$db,$db_user,$db_pass);
+					
+					$content_list="";
+					
 					if (!isset($_GET['layout_id'])) {
-						$sql_query=$conn->prepare("SELECT name FROM screens WHERE qrcode_id=?"); 
+						$sql_query=$conn->prepare("SELECT id,name FROM screens WHERE qrcode_id=?"); 
 						$sql_query->bindParam(1,$_GET['qr']);
 						$sql_query->execute();
 						$screen_result=$sql_query->fetchAll();
 						
+						
 						foreach ($screen_result as $screen_row){ //always return zero or one screen because qrcode_id is unique
-							$sql_query=$conn->prepare("SELECT id, name FROM contents"); //IT WILL BE CHANGED TO SELECT CONTENT 
-							//$sql_query->bindParam(1,$_GET['qr']);
+							$sql_query=$conn->prepare("SELECT content_id FROM content_scheduler WHERE screen_id=?"); 
+							$sql_query->bindParam(1,$screen_row['id']);
 							$sql_query->execute();
-							$content_result=$sql_query->fetchAll();
+							$content = $sql_query->fetchAll();
 							
-							foreach ($content_result as $content_row){
-								echo "<li><a href = 'select_layout.php?layout_id=".$content_row[0]."&qr=".$_GET['qr']."'>Content name ".$content_row[1]."</a></li>";
+							foreach ($content as $content_row) {
+								$sql_query=$conn->prepare("SELECT name FROM contents WHERE id = ?");
+								$sql_query->bindParam(1,$content_row['content_id']);
+								$sql_query->execute();
+								$content_result=$sql_query->fetch();
+								
+								
+								$content_list = $content_list."<li><a href = 'select_layout.php?layout_id=".$content_row[0]."&qr=".$_GET['qr']."'>".$content_result['name']."</a></li>";
 							}
+							echo $content_list;
+							
 						}
 					} else if (isset($_GET['layout_id'])) { //when a button has pressed
-						$sql_query=$conn->prepare("SELECT content_html, backcolor, backimage_url FROM contents WHERE id = ?");  //select new content
+						$sql_query=$conn->prepare("SELECT content_html, backcolor, backimage_url, backimage_option FROM contents WHERE id = ?");  //select new content
 						$sql_query->bindParam(1,$_GET['layout_id']);
 						$sql_query->execute();
 						$layout_result=$sql_query->fetchAll();
 						
 						foreach ($layout_result as $layout_row){
-							$sql_query=$conn->prepare("UPDATE Screens SET html=?, backcolor=?, backimage_url=? WHERE qrcode_id=?"); //update screen
-							$sql_query->bindParam(1,$layout_row[0]);
-							$sql_query->bindParam(2,$layout_row[1]);
-							$sql_query->bindParam(3,$layout_row[2]);
-							$sql_query->bindParam(4,$_GET['qr']);
+							$sql_query=$conn->prepare("UPDATE screens SET content_id=? WHERE qrcode_id=?"); //update screen
+							$sql_query->bindParam(1,$_GET['layout_id']);
+							$sql_query->bindParam(2,$_GET['qr']);
 							$sql_query->execute();
 							
 							do { //generate a unique random qrcode_id

@@ -192,6 +192,28 @@ img ~ :not(.qrcode_link), img ~ :not(.qrcode_layout)  { /* images inserted by us
 	border: 1px solid #000000;
 }
 
+.edit_rule{
+	background-color: Transparent;
+	background-repeat:no-repeat;
+	cursor:pointer;
+	outline:none;
+	border: none;
+	color:blue;
+	font-size:1.3em;
+	font-family:Garamond,"Apple Garamond";
+}
+
+.close_buttons_style{ /* make a nice red X button */
+	background-color: Transparent;
+	background-repeat:no-repeat;
+	cursor:pointer;
+	outline:none;
+	border: none;
+	color:red;
+	font-size:1.3em;
+	font-family:Garamond,"Apple Garamond";
+}
+
 .colorpick_div{ /* a div that displays colors */
 	display:inline-flex;
 	background-color:#000000;
@@ -199,6 +221,20 @@ img ~ :not(.qrcode_link), img ~ :not(.qrcode_layout)  { /* images inserted by us
 	height:15px;
 	margin:5px;
 	border: 1px solid black;
+}
+
+#preview{ /* thubnail of image when mouse is over an image in image list */
+	position:absolute;
+	background:#FFFFFF;
+	display:none;
+	border : 1px solid black;
+	width:200px;
+	height:150px;
+}
+
+#preview > img {
+	width:inherit;
+	height:inherit;
 }
 
 .scrolling_text{ /* scroll text on X axis */

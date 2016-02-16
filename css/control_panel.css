@@ -1,3 +1,4 @@
+/*
 #welcome_msg{
 	z-index:-1;
 	position:relative;
@@ -9,6 +10,21 @@
 	text-align:center;
 	background-color:#A9FFFF;
 	padding:.18em;
+	border:0.2em dashed #15686A;
+	white-space:nowrap;
+}*/
+
+
+#welcome_msg{
+	position:absolute;
+	display:inline-block;
+	left:0%;
+	right:0%;
+	margin-left:auto;
+	margin-right:auto;
+	text-align:center;
+	background-color:#A9FFFF;
+	padding:0.2em;
 	border:0.2em dashed #15686A;
 	white-space:nowrap;
 }

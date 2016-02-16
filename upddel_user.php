@@ -7,10 +7,18 @@ $conn=connect_db($host,$db,$db_user,$db_pass);
 
 if (isset($_POST['delete_user'])){
 		$username = filter_var($_POST['delete_user'],FILTER_SANITIZE_STRING,FILTER_FLAG_STRIP_LOW);
-		$sql_query=$conn->prepare("DELETE FROM users_information WHERE username=?");
-		$sql_query->bindParam(1,$username);
-		$sql_query->execute();
-		echo "User: ".$username." removed." ;
+		if ($username != "root") {
+			$sql_query=$conn->prepare("DELETE FROM users_information WHERE username=?");
+			$sql_query->bindParam(1,$username);
+			if ($sql_query->execute()) {
+				echo "<p class = 'success'>User: ".$username." removed.</p>" ;
+			} else {
+				echo "<p class = 'error_msg'>An error occured. Please try again.</p>" ;
+			}
+		} else {
+			echo "<p class = 'error_msg'>You cannot delete root account.</p>";
+		}
+		
 }
 
 if (isset($_POST['update_user'])){
@@ -31,17 +39,19 @@ if (isset($_POST['update_user'])){
 	if ($var1 == 1 || $db_email==$email) {
 		$lname=filter_var($_POST['lname'],FILTER_SANITIZE_STRING,FILTER_FLAG_STRIP_LOW);
 		$fname=filter_var($_POST['fname'],FILTER_SANITIZE_STRING,FILTER_FLAG_STRIP_LOW);
-	
+		
 		$sql_query=$conn->prepare("UPDATE users_information SET username=?, fname=?, lname=? WHERE email=?");
 		$sql_query->bindParam(1,$username);
 		$sql_query->bindParam(2,$fname);
 		$sql_query->bindParam(3,$lname);
 		$sql_query->bindParam(4,$email);
-		$sql_query->execute();
-	
-		echo "Information of user with ".$email." updated.";
+		if ($sql_query->execute()) {
+			echo "<p class='success'>Information of user with ".$email." updated.</p>";
+		} else {
+			echo "<p class='error_msg'>An error occured. Please try again.</p>";
+		}
 	} else {
-		echo "Username already exists. Try a new one.";
+		echo "<p class='error_msg'>Username already exists. Try a new one.</p>";
 	}
 }
 

@@ -9,9 +9,11 @@ if (isset($_POST['delete_device'])){
 		$screen = filter_var($_POST['delete_device'],FILTER_SANITIZE_STRING,FILTER_FLAG_STRIP_LOW);
 		$sql_query=$conn->prepare("DELETE FROM screens WHERE name=?");
 		$sql_query->bindParam(1,$screen);
-		$sql_query->execute();
-		
-		echo "Screen named ".$screen." removed." ;
+		if ($sql_query->execute()) {
+			echo "<p class = 'success'>Screen named ".$screen." removed.</p>" ;
+		} else {
+			echo "<p class = 'error_msg'>An error occured. Please try again.</p>" ;
+		}
 }
 
 if (isset($_POST['update_device'])){
@@ -36,19 +38,25 @@ if (isset($_POST['update_device'])){
 		$sql_query->bindParam(1,$screen);
 		$sql_query->bindParam(2,$descr);
 		$sql_query->bindParam(3,$old_name);
-		$sql_query->execute();
+		if ($sql_query->execute()) {
+			echo "<p class='success'>Screen named ".$old_name." updated.</p>";
+		} else {
+			echo "<p class='error_msg'>An error occured. Please try again.</p>";
+		}
 	
-		echo "Screen named ".$old_name." updated.";
 	} else if ($db_name==$old_name) {
 		$sql_query=$conn->prepare("UPDATE screens SET name=?, description=? WHERE id=?");
 		$sql_query->bindParam(1,$screen);
 		$sql_query->bindParam(2,$descr);
 		$sql_query->bindParam(3,$id);
-		$sql_query->execute();
+		if ($sql_query->execute()) {
+			echo "<p class='success'>Screen named ".$screen." updated.</p>";
+		} else {
+			echo "<p class='error_msg'>An error occured. Please try again.</p>";
+		}
 
-		echo "Screen named ".$screen." updated.";
 	} else {
-		echo "Screen name already exists.";
+		echo "<p class='error_msg'>Screen name already exists.</p>";
 	}
 }
 

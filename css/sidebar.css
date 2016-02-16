@@ -3,6 +3,8 @@
 	float:left;
 	display:block;
 	vertical-align:top;
+	padding-top:10px;
+	top:7%;
 }
 
 #cpside button{
@@ -32,4 +34,20 @@
 	text-align:center;
 	margin-left:25px;
 	display:block;
+}
+
+.explain{
+	position:fixed;
+	top: 18%;
+	left:0;
+	right:0;
+	display:none;
+	width:270px;
+	padding:40px 40px;
+	margin:auto auto;
+	text-align:center;
+	color:#000;
+	background:#96B6D3;
+	border-radius:50%;
+	z-index:10;
 }
