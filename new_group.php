@@ -1,9 +1,5 @@
 <?php
-	session_start();
-	if ((!isset($_SESSION['admin'])) || ($_SESSION['admin'] != "root"))
-	{
-		header('Location: login_page.php');
-	}
+	require_once('session_check_root.php');
 ?>
 
 <?php
@@ -14,44 +10,57 @@ $conn=connect_db($host,$db,$db_user,$db_pass);
 
 if(isset($_POST['submit_reg'])) {
 	$group = filter_var($_POST['gname'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
+	$group_descr = filter_var($_POST['group_description'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
 	$sql_query=$conn->prepare("SELECT name FROM groups WHERE name=?");
 	$sql_query->bindParam(1,$group);
 	$sql_query->execute();
 	$result=$sql_query->fetchAll();
 	
 	$group_length=1;
+	$descr_length = 1;
+
 	
-	if (strlen($group)<=25){
+	if (strlen($group)<=25 && strlen($group_descr)<=300){
 		if (empty($result)) { //if group name DOES NOT EXISTS
-			$sql_query=$conn->prepare("INSERT INTO groups (name) VALUES (?)");
-			$sql_query->bindParam(1,$_POST['gname']);
+			$sql_query=$conn->prepare("INSERT INTO groups (name,description) VALUES (?,?)");
+			$sql_query->bindParam(1,$group);
+			$sql_query->bindParam(2,$group_descr);
 			if ($sql_query->execute()){
-				$success_msg="Group: ".$_POST['gname']." created";
+				$success_msg="Group: ".$group." created.";
+				
+				$sql_query=$conn->prepare("SELECT id FROM groups WHERE name=?");
+				$sql_query->bindParam(1,$group);
+				$sql_query->execute();
+				$group_id = $sql_query->fetch();
+				
+				$sql_query=$conn->prepare("SELECT id FROM users_information WHERE username=?");
+				$sql_query->bindValue(1,"root");
+				$sql_query->execute();
+				$user_id = $sql_query->fetch();
+				
+				$sql_query=$conn->prepare("INSERT INTO users_privileges (user_id,group_id) VALUES (?,?)");
+				$sql_query->bindParam(1,$user_id['id']);
+				$sql_query->bindParam(2,$group_id['id']);
+				$sql_query->execute();
+				
+				$unique_group = 1;
+				$group_descr = "";
+				$group = "";
 			} else {
 				$success_msg="An error occured. Please try again.";
 			}
-			
-			$sql_query=$conn->prepare("SELECT id FROM groups WHERE name=?");
-			$sql_query->bindParam(1,$_POST['gname']);
-			$sql_query->execute();
-			$group_id = $sql_query->fetch();
-			
-			$sql_query=$conn->prepare("SELECT id FROM users_information WHERE username=?");
-			$sql_query->bindValue(1,'root');
-			$sql_query->execute();
-			$user_id = $sql_query->fetch();
-			
-			$sql_query=$conn->prepare("INSERT INTO users_privileges (user_id,group_id) VALUES (?,?)");
-			$sql_query->bindParam(1,$user_id['id']);
-			$sql_query->bindParam(2,$group_id['id']);
-			$sql_query->execute();
-			
-			$unique_group = 1;
 		} else {
 			$unique_group = 0;
 		}
 	} else {
-		$group_length=0;
+		if (strlen($group_descr)>300){
+			$descr_length = 0;
+			$group_descr = "";
+		}
+		if (strlen($group)>25){
+			$group_length = 0;
+			$group = "";
+		}
 	}
 }
 $conn = NULL;
@@ -70,7 +79,7 @@ $conn = NULL;
     
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="js/sidebar.js"></script>
-    <script src="js/validation.js"></script>
+
 </head>
 
 
@@ -104,10 +113,26 @@ $conn = NULL;
 			}
 			?>
 			<br>
-			<input type="submit" class="submit_btn" name="submit_reg" value="Create" disabled />
+			<label>
+				<span>Description:</span>
+				<textarea name="group_description" maxlength="300" value="<?php echo $group_descr; ?>" onblur="notblank(this.value,this.name);"><?php echo $group_descr; ?></textarea>
+				<br>
+			</label>
+			
+			<?php
+				if (isset($_POST['submit_reg']) && $descr_length==0){
+					print '<span class = "error_msg">';
+					echo "Description must not exceed 300 characters.";
+					print '</span>';
+					print '<br><br>';
+				}
+			?>
+			<input type="submit" class="submit_btn" name="submit_reg" value="Create">
 	</form>
 	<div class = "success"><?php echo $success_msg; ?></div>
 	</div>
 	<?php include 'footer.php'; ?>
+	
+<script src="js/validation.js"></script>
 </body>
 </html>

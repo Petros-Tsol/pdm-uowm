@@ -1,9 +1,5 @@
 <?php
-	session_start();
-	if (!isset($_SESSION['admin']))
-	{
-		header('Location: login_page.php');
-	}
+	require_once('session_check.php');
 ?>
 <!DOCTYPE html>
 <html>
@@ -44,20 +40,28 @@
 	echo "<tr>";
 	echo "<th>Screen</th>";
 	echo "<th>Description</th>";
+	echo "<th>Content</th>";
 	echo "<th>Expire on</th>";
 	echo "</tr>";
 	
 	foreach ($result as $row){
-		$sql_query=$conn->prepare("SELECT name, description, valid_time FROM screens WHERE webid<>? AND id=?");
+		$sql_query=$conn->prepare("SELECT name, description, valid_time, content_id FROM screens WHERE webid<>? AND id=?");
 		$sql_query->bindValue(1,'');
 		$sql_query->bindParam(2,$row['screen_id']);
 		$sql_query->execute();
 		$screen = $sql_query->fetch();
 		
-		if (!empty($screen)) { //it will return empty records. ignore them.
+		$sql_query=$conn->prepare("SELECT name FROM contents WHERE id=?");
+		$sql_query->bindParam(1,$screen['content_id']);
+		$sql_query->execute();
+		$content = $sql_query->fetch();
+		
+		
+		if (time()<= $screen['valid_time']) { //if valid_time has not passed.
 			echo "<tr>";
 			echo "<td>".$screen['name']."</td>";
 			echo "<td>".$screen['description']."</td>";
+			echo "<td>".$content['name']."</td>";
 			echo "<td>".date("l d F Y H\:i T",$screen['valid_time'])."</td>";
 			echo "</tr>";
 		}

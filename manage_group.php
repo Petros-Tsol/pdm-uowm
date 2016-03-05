@@ -1,9 +1,5 @@
 <?php
-	session_start();
-	if ((!isset($_SESSION['admin'])) || ($_SESSION['admin'] != "root"))
-	{
-		header('Location: login_page.php');
-	}
+	require_once('session_check_root.php');
 ?>
 
 <!DOCTYPE html>
@@ -84,6 +80,7 @@
 			print '</label>';
 		}
 		print '</div>';
+
 		
 		print '<div id = "success_msg"></div>';
 	print '</div>';

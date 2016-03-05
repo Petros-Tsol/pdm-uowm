@@ -20,43 +20,56 @@ if (isset($_POST['update_device'])){
 	$screen = filter_var($_POST['update_device'],FILTER_SANITIZE_STRING,FILTER_FLAG_STRIP_LOW);
 	$descr = filter_var($_POST['description'],FILTER_SANITIZE_STRING,FILTER_FLAG_STRIP_LOW);
 	$old_name = $_POST['old_name'];
-
-	$sql_query=$conn->prepare("SELECT id, name FROM screens WHERE name = ?");
-	$sql_query->bindParam(1,$screen);
-	$sql_query->execute();
-	$result=$sql_query->fetchAll();
-	//print_r($result);
-	$var1=empty($result);
+	$error_msg = "";
 	
-	foreach ($result as $row){
-		$id = $row[0];
-		$db_name=$row[1];
-	}
-	
-	if ($var1 == 1) {
-		$sql_query=$conn->prepare("UPDATE screens SET name=?, description=? WHERE name=?");
+	if (strlen($screen)<=25 && strlen($descr)<=300) {
+		$sql_query=$conn->prepare("SELECT id, name FROM screens WHERE name = ?");
 		$sql_query->bindParam(1,$screen);
-		$sql_query->bindParam(2,$descr);
-		$sql_query->bindParam(3,$old_name);
-		if ($sql_query->execute()) {
-			echo "<p class='success'>Screen named ".$old_name." updated.</p>";
-		} else {
-			echo "<p class='error_msg'>An error occured. Please try again.</p>";
+		$sql_query->execute();
+		$result=$sql_query->fetchAll();
+		//print_r($result);
+		$var1=empty($result);
+		
+		foreach ($result as $row){
+			$id = $row[0];
+			$db_name=$row[1];
 		}
-	
-	} else if ($db_name==$old_name) {
-		$sql_query=$conn->prepare("UPDATE screens SET name=?, description=? WHERE id=?");
-		$sql_query->bindParam(1,$screen);
-		$sql_query->bindParam(2,$descr);
-		$sql_query->bindParam(3,$id);
-		if ($sql_query->execute()) {
-			echo "<p class='success'>Screen named ".$screen." updated.</p>";
-		} else {
-			echo "<p class='error_msg'>An error occured. Please try again.</p>";
-		}
+		
+		if ($var1 == 1) {
+			$sql_query=$conn->prepare("UPDATE screens SET name=?, description=? WHERE name=?");
+			$sql_query->bindParam(1,$screen);
+			$sql_query->bindParam(2,$descr);
+			$sql_query->bindParam(3,$old_name);
+			if ($sql_query->execute()) {
+				echo "<p class='success'>Screen named ".$old_name." updated.</p>";
+			} else {
+				echo "<p class='error_msg'>An error occured. Please try again.</p>";
+			}
+		
+		} else if ($db_name==$old_name) {
+			$sql_query=$conn->prepare("UPDATE screens SET name=?, description=? WHERE id=?");
+			$sql_query->bindParam(1,$screen);
+			$sql_query->bindParam(2,$descr);
+			$sql_query->bindParam(3,$id);
+			if ($sql_query->execute()) {
+				echo "<p class='success'>Screen named ".$screen." updated.</p>";
+			} else {
+				echo "<p class='error_msg'>An error occured. Please try again.</p>";
+			}
 
+		} else {
+			echo "<p class='error_msg'>Screen name already exists.</p>";
+		}
 	} else {
-		echo "<p class='error_msg'>Screen name already exists.</p>";
+		if (strlen($screen)>25) {
+			$error_msg = "Screen name must not exceed 15 characters.<br>";
+		}
+		
+		if (strlen($descr)>300) {
+			$error_msg = $error_msg."Description must not exceed 300 characters.";
+		}
+		
+		echo "<p class='error_msg'>".$error_msg."</p>";
 	}
 }
 

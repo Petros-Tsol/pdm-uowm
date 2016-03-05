@@ -21,7 +21,8 @@ body{
 	background-color:#A9FFFF;
 }
 
-#ann_table table td,th{
+#ann_table table tr,td,th{
+	empty-cells:show;
 	border:1px solid black;
 	text-align: center;
 	padding:5px;
@@ -35,9 +36,24 @@ body{
 	width:30em;
 }
 
+#duration_sec{
+	width:auto !important;
+}
+
+#duration_date{
+	width:auto !important;
+	margin-left:0.5em !important;
+}
+
 .error_msg{
 	float:none !important;
 }
+
+.submit_btn{
+	width:80px !important;
+}
+
+
 
 /*
 .ui-datepicker{

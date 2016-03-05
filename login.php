@@ -19,7 +19,7 @@ if (isset($_POST['submit_login']))
 	{
 		if (password_verify($pass,$result['password'])) { //verify the input password with the hashed
 			session_start();
-			$_SESSION["admin"] = htmlspecialchars($user);
+			$_SESSION["admin"] = $user;
 
 			header('Location: control_panel.php');
 		} else {

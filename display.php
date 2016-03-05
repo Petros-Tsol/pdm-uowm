@@ -1,18 +1,22 @@
 <?php
 	session_start();
-	
-	if (!isset($_SESSION['admin']))
-	{
-		header('Location: login_page.php');
+	if (isset($_GET['name']) == false) {
+		if (isset($_SESSION['device_id']) == false) {
+			if (isset($_COOKIE['dev_id']) == false) {
+				require_once('session_check.php');
+			}
+		}
 	}
 	
 	require_once('connect.inc');
 	require_once('connect2db');
 	$conn=connect_db($host,$db,$db_user,$db_pass);
+	
+	
 	if (isset($_SESSION['device_id'])){
 		if (!isset($_COOKIE['dev_id'])) {
 			if ($_SESSION['unique'] == true) { //if this is the first screen with this name
-				$cookie_life = 1800; // how much time the screen will be active (in seconds)
+				$cookie_life = 1500; // how much time the screen will be active (in seconds), first number is years, second is seconds in an hour, third is hours in a day and last is days of the year.
 				setcookie('dev_id',$_SESSION['device_id'],time()+$cookie_life,'/'); //5 sec have already passed because of the page reload
 
 				$sql_query=$conn->prepare("UPDATE screens SET valid_time=? WHERE webid=?");
@@ -49,8 +53,6 @@
 	<script type="text/javascript" src="js/qrcode.js"></script>
 	<script type="text/javascript" src="http://service.24media.gr/js/deltiokairou_widget.js"></script>
 	
-	
-	
 </head>
 
 <body>
@@ -82,7 +84,7 @@
 					print '<optgroup label="'.$group_res['name'].'">';
 					
 					for ($i=0;$i<count($row);$i=$i+1){
-						$sql_query=$connection->prepare("SELECT name,webid FROM screens WHERE id = ?");
+						$sql_query=$connection->prepare("SELECT name,webid,unique_id FROM screens WHERE id = ?");
 						$sql_query->bindValue(1,$row[$i]);
 						$sql_query->execute();
 						$screen_res = $sql_query->fetch();
@@ -91,20 +93,31 @@
 						} else {
 							print '<option value = "'.$screen_res['name'].'" style = "color:#29b332;">'.$screen_res['name'].'</option>';
 						}
+						$unique_id = $unique_id.'-'.$screen_res['unique_id'];
 					}
 						
 					print '</optgroup>';
 				}
+				
+				
 				print "</select>";
 				print "<button type='button'>Set</button><br>";
 				print "<br>";
+				
+				
+				$partial = preg_split("/[\s\-]+/",$unique_id,NULL,PREG_SPLIT_NO_EMPTY);
+				$server = $_SERVER['SERVER_NAME'];
+
+				for ($i=0;$i<count($partial);$i=$i+1) {
+					print '<p>URL for direct access <a href ="http://'.$server.'/pd_uowm/display.php?name='.$partial[$i].'">'.$server.'/pd_uowm/display.php?name='.$partial[$i].'</a></p>';
+				}
 			} else {
 				print "The administrator has not added a screen for your group.";
 			}
 			print "</div>";
 		}
 		
-		if (!isset($_GET['screen'])) { //if a screen has not been provided. So the url is not in a pattern like display.php?screen=something, it's just display.php
+		if (!isset($_GET['name'])) { //if a screen has not been provided. So the url is not in a pattern like display.php?screen=something, it's just display.php
 			print '<h1 class = "main_title">UOWM PUBLIC DISPLAY</h1>';
 			select_device($conn);
 		}
@@ -114,7 +127,7 @@
 	$conn = NULL;
 ?>
 
-
+<script src="js/content_properties.js"></script>
 <script src="js/display_functions.js"></script>
 
 

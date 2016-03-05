@@ -4,7 +4,10 @@
 	display:block;
 	vertical-align:top;
 	padding-top:10px;
-	top:7%;
+	top:4em;
+	border:3px solid;
+	background-image: linear-gradient(to bottom, #55C6C7, #907FE4);
+	padding:1em;
 }
 
 #cpside button{
@@ -29,7 +32,7 @@
 #cpside a{
 	overflow:visible;
 	width:120px;
-	color:#1213CD;
+	color:#FFFFFF;
 	text-decoration:underline;
 	text-align:center;
 	margin-left:25px;

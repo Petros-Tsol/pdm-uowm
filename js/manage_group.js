@@ -23,7 +23,7 @@ $(document).on('change',"#groups", function() {
 		
 		for (var i = 0;i < data.users.length;i=i+1) {
 			$("input[name='user']").each(function(){
-				console.log(data.users[i][0]);
+				//console.log(data.users[i][0]);
 				if ($(this).val()==data.users[i][0]) {
 					$(this).prop('checked',true);
 				}

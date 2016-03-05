@@ -1,9 +1,5 @@
 <?php
-	session_start();
-	if ((!isset($_SESSION['admin'])) || ($_SESSION['admin'] != "root"))
-	{
-		header('Location: login_page.php');
-	}
+	//require_once('session_check_root.php');
 ?>
 
 <?php
@@ -110,7 +106,8 @@ if(isset($_POST['submit_reg'])) {
 					$fname="";
 					$lname="";
 					$email="";
-					$success_msg = 'New user registered. An e-mail have sent to user.';
+					header('Location: login_page.php?register=success');
+					$success_msg = 'New user registered. An e-mail have sent to him/her.';
 				}
 			}
 		}
@@ -147,7 +144,6 @@ $conn = NULL;
     
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="js/sidebar.js"></script>
-    <script src="js/validation.js"></script>
 </head>
 <body>
 <?php
@@ -208,7 +204,7 @@ $conn = NULL;
 	<br>
 	<label>
 		<span>E-mail:</span>
-		<input type="email" name="email" maxlength="50" value="<?php echo $email; ?>" onblur="checkemail(this.value,this.name);">
+		<input type="text" name="email" maxlength="50" value="<?php echo $email; ?>" onblur="checkemail(this.value,this.name);">
 		<?php
 		if (isset($_POST['submit_reg']) && $email_length==0){
 			print '<span class = "error_msg">';
@@ -251,13 +247,11 @@ $conn = NULL;
 		?>
 	</label>
 	<br>
-	<input type="submit" name="submit_reg" value="Register" class="submit_btn" disabled>
+	<input type="submit" name="submit_reg" value="Register" class="submit_btn">
 </form>
 <div class = "success"><?php echo $success_msg; ?></div>
 </div>
 <?php include 'footer.php'; ?>
-<script>
-
-</script>
+<script src = "js/validation.js"></script>
 </body>
 </html>

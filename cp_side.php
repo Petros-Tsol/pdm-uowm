@@ -1,5 +1,5 @@
 <?php
-	session_start();
+	//require_once('session_check.php');
 ?>
 
 <div id = "cpside">
@@ -9,12 +9,13 @@
 			print '<a href="register_user.php">Create user</a>';
 			print '<a href="search_user.php">Search user</a>';
 		print '<br>';
-		print '<button class = "menu_button">Device</button>';
-			print '<a href="new_device.php">Create device</a>';
-			print '<a href="search_device.php">Search device</a>';
+		print '<button class = "menu_button">Screen</button>';
+			print '<a href="new_device.php">Create screen</a>';
+			print '<a href="search_device.php">Search screen</a>';
 		print '<br>';
 		print '<button class = "menu_button">Group</button>';
 			print '<a href="new_group.php">Create group</a>';
+			print '<a href="search_group.php">Search group</a>';
 			print '<a href="manage_group.php">Manage group</a>';
 		print '<br>';
 	}
@@ -36,7 +37,7 @@ if ($_SESSION['admin']=="root") {
 	print '</blockquote>';
 
 	print '<blockquote>';
-		print '<p class = "explain">In the Device menu, you can add a screen in the database, update its characteristics or delete it.</p>';
+		print '<p class = "explain">In the Screen menu, you can add a screen in the database, update its characteristics or delete it.</p>';
 	print '</blockquote>';
 
 	print '<blockquote>';

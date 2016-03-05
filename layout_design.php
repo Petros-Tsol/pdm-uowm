@@ -1,9 +1,5 @@
 <?php
-	session_start();
-	if (!isset($_SESSION['admin']))
-	{
-		header('Location: login_page.php');
-	}
+	require_once('session_check.php');
 ?>
 
 <!DOCTYPE html>
@@ -30,23 +26,37 @@
 	
 	<script type="text/javascript" src="js/qrcode.js"></script>
 	<script src="/pd_uowm/ckeditor/ckeditor.js"></script>
-</head>
-<body>
-<div id="tools">
 	
+	<script type="text/javascript" src="http://service.24media.gr/js/deltiokairou_widget.js"></script>
+</head>
+<body onbeforeunload = "return warning_message()">
+<div id="tools">
+	<a id = "link_to_control_panel"href="control_panel.php">Return to control panel</a>
+	<br><br>
 	<div id = "buttons">
-		<button id = "lay_but">Layouts</button>	
-		<button id = "tool_but">Options</button>
-		<button id = "divs_but">Manage Divs</button>
-		<button id = "cont_but">Manage Contents</button><br><hr>
-		<button id = "new_btn">New Layout</button>
-		<button id = "save_btn">Save Layout</button>
-		<a href = "#openModal"><button onclick="document.getElementById('select_cont_name_div').style.display='none';document.getElementById('new_cont_name_div').style.display='none';">Save Content</button></a>
-		<select id = "load_content"></select><br><hr>
+		<div class= "buttons_menu">
+			<button id = "lay_but">Layouts</button>	
+			<button id = "tool_but">Options</button>
+			<button id = "divs_but">Manage Divs</button>
+			<button id = "cont_but">Manage Contents</button><br>
+		</div><hr>
+		
+		<div class = "buttons_menu">
+			<button id = "new_btn">New Layout</button>
+			<button id = "save_btn">Save Layout</button>
+			<a href = "#openModal"><button onclick="document.getElementById('select_cont_name_div').style.display='none';document.getElementById('new_cont_name_div').style.display='none';">Save Content</button></a><br>
+		</div><hr>
+		
+		<div class = "buttons_menu">
+			<select id = "load_content"></select>
+			<button id = "button_load_cont" onclick="">Load Content</button><br>
+		</div><hr>
+		
 		<div id="openModal" class="modalDialog">
 			<div>
 				<a href="#close" class="close">X</a>
 				<h3>Please select</h3>
+				<button id ="upd_curr_cont">Update Current</button><br>
 				<button onclick="document.getElementById('select_cont_name_div').style.display='none';document.getElementById('new_cont_name_div').style.display='inline';">New Content</button>
 				<button onclick="document.getElementById('select_cont_name_div').style.display='inline';document.getElementById('new_cont_name_div').style.display='none';">Update Content</button>
 				<div id = "new_cont_name_div">
@@ -62,6 +72,8 @@
 				</div>
 			</div>
 		</div>
+		
+		<div class = "buttons_menu">
 		<?php
 			require_once('connect.inc');
 			require_once('connect2db');
@@ -106,9 +118,15 @@
 			print'</select>';
 			$conn = NULL;
 		?>
-		<button id = "upd_scr" onclick="update_screen();">Update Screen(s)</button>
+		<button id = "upd_scr" onclick="update_screen();">Update Screen(s)</button><br>
+		</div><hr>
+		<div class = "buttons_menu">
+			<button id = "preview_scr" onclick="preview_screen();">Preview</button>
+			<input id="preview_width" type="number" value="" placeholder = "Width" class="number_inputs"></input> x
+			<input id="preview_height" type="number" value="" placeholder = "Height" class="number_inputs"></input>
+		</div>
 	</div>
-
+	<div id = "server_return"></div>
 	
 	<div id = "toolbox" class = "options_menu">
 		<form id = "data_form">
@@ -120,13 +138,15 @@
 			<label><input type="radio"  name="data_type" value="weather">Weather</label><br>
 			<label><input type="radio"  name="data_type" value="timer">Clock/Countdown</label><br>
 			<label><input type="radio"  name="data_type" value="qrcodes">QR Code</label><br>
+			<label><input type="radio"  name="data_type" value="iframe">Iframe</label><br>
 			<label><input type="radio"  name="data_type" value="bg">Background</label><br>
 			<label><input type="radio"  name="data_type" value="html">HTML</label><br>
 		</form>
 		<div id = "mode"></div>	
 	</div>
 	<div id = "div_management" class = "options_menu" style="display:none;">
-		<div id = "current_divs"></div>
+		<br>
+		<div id = "current_divs">PLEASE LOAD A LAYOUT</div>
 		<div id = "div_scheduler">
 			<h4>DIV SCHEDULER</h4>
 			<table id ="table_scheduler">
@@ -165,6 +185,7 @@
 			</table>
 			<button class="show_hide_div" value = "show">Show</button>
 			<button class="show_hide_div" value = "hide">Hide</button>
+			<button id = "reset_div_scheduler_table" value = "reset_div_sch">Reset</button>
 		</div>
 		<div id = "div_rules"></div>
 	</div>
@@ -172,32 +193,17 @@
 		<div id = "current_contents">
 			<br>
 			<h4>Add contents for rotation</h4>
-			<?php
-			require_once('connect.inc');
-			require_once('connect2db');
-				
-			$conn=connect_db($host,$db,$db_user,$db_pass);
-			print "<select id= 'select_content'>";
-				$sql_query=$conn->prepare("SELECT name FROM contents");
-				$sql_query->execute();
-				$result = $sql_query->fetchAll();
-				foreach ($result as $row) {
-					print '<option value = "'.$row['0'].'">'.$row[0].'</option>';
-				}
-			print'</select>';
-			$conn = NULL;
-			?>
+			<select id= 'select_content_rotation'></select>
 			<button id = "add_content">Add</button>
 			<ol>				
 			</ol>
 			<span>Time between rotation (seconds)</span>
-			<input type="text" id = "content_sec_rotate"><br>
+			<input type="number" min = "0" value = "0" id = "content_sec_rotate"><br>
 			<button id = "update_screen_scheduler">Update Screen Scheduler</button>
 		</div>
 	</div>
 	<!--<div id = "mode"></div>	-->
 	<div id = "saved_layouts" class = "options_menu" style="display:none;"></div>
-	<div id = "server_return"></div>
 </div>
 <div id="draw_area_cont">
 	<div id="draw_area">

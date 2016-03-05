@@ -1,21 +1,20 @@
 <?php
-	session_start();
-	if ((!isset($_SESSION['admin'])) || ($_SESSION['admin'] != "root"))
-	{
-		header('Location: login_page.php');
-	}
+	require_once('session_check_root.php');
 ?>
 
 <?php
 require_once('connect.inc');
 require_once('connect2db');
+require_once('rng.php');
 			
 $conn=connect_db($host,$db,$db_user,$db_pass);
 
 
 if(isset($_POST['submit_reg'])) {
+	
 	$screen=filter_var($_POST['scrname'],FILTER_SANITIZE_STRING,FILTER_FLAG_STRIP_LOW);
 	$descr=filter_var($_POST['description'],FILTER_SANITIZE_STRING,FILTER_FLAG_STRIP_LOW);
+	
 	$groups=$_POST['group'];
 
 	
@@ -37,9 +36,18 @@ if(isset($_POST['submit_reg'])) {
 		} else { // if screen name is unique
 			$uniquescreen = 1;
 			
-			$sql_query=$conn->prepare("INSERT INTO screens (name,description) VALUES (?,?)");
+			do { //generate a unique random unique_id
+				$unique_id = random_webid(10);
+				$sql_query=$conn->prepare("SELECT unique_id FROM screens WHERE unique_id LIKE ?");
+				$sql_query->bindParam(1,$qrid);
+				$sql_query->execute();
+				$result=$sql_query->fetch();
+			} while (!empty($result));
+			
+			$sql_query=$conn->prepare("INSERT INTO screens (name,description,unique_id) VALUES (?,?,?)");
 			$sql_query->bindParam(1,$screen);
 			$sql_query->bindParam(2,$descr);
+			$sql_query->bindParam(3,$unique_id);
 			
 			if ($sql_query->execute()) {
 				$success_msg = "New device created.";
@@ -66,6 +74,7 @@ if(isset($_POST['submit_reg'])) {
 					}
 				}
 				$screen="";
+				$descr="";
 			} else {
 				$success_msg = "An error occured. Please try again.";
 			}
@@ -74,9 +83,11 @@ if(isset($_POST['submit_reg'])) {
 	} else {
 		if (strlen($descr)>300){
 			$descr_length = 0;
+			$descr = "";
 		}
 		if (strlen($screen)>25){
 			$scrname_length = 0;
+			$screen = "";
 		}
 	}
 }
@@ -88,7 +99,7 @@ $conn = NULL;
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PD UOWM - Create Device</title>
+    <title>PD UOWM - Create Screen</title>
     <meta charset="UTF-8">
     
     <link rel="stylesheet" type="text/css" href="css/sidebar.css">
@@ -98,7 +109,7 @@ $conn = NULL;
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     
     <script src="js/sidebar.js"></script>
-    <script src="js/validation.js"></script>
+
 </head>
 <body>
 	
@@ -107,7 +118,7 @@ $conn = NULL;
 		include 'cp_side.php';
 ?>
 <div class = "form_design">
-	<h1>Create Device</h1>
+	<h1>Create Screen</h1>
 <form method="post" action="new_device.php">
 	<label>
 		<span>Screen Name:</span>
@@ -133,7 +144,7 @@ $conn = NULL;
 	
 	<label>
 		<span>Description:</span>
-    	<textarea name="description" maxlength="300" value="<?php echo $descr; ?>" onblur="notblank(this.value,this.name);"></textarea>
+    	<textarea name="description" maxlength="300" value="<?php echo $descr; ?>" onblur="notblank(this.value,this.name);"><?php echo $descr; ?></textarea>
     	<br>
 	</label>
 	<?php
@@ -167,13 +178,13 @@ $conn = NULL;
 		?>   	
 	</label>
 	<br>
-	<input type="submit" name="submit_reg" class= "submit_btn" value="Register" disabled>
+	<input type="submit" name="submit_reg" class= "submit_btn" value="Register">
 
 </form>
 <div class = "success"><?php echo $success_msg; ?></div>
 </div>
 <?php include 'footer.php'; ?>
-<script>
-</script>
+
+<script src="js/validation.js"></script>
 </body>
 </html>

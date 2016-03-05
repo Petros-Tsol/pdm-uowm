@@ -35,12 +35,19 @@ if ($_POST['button']=="update") {
 		$group_id = $row[0];
 	}
 	
+	$sql_query=$conn->prepare("SELECT id FROM users_information WHERE username=?");
+	$sql_query->bindValue(1,"root");
+	$sql_query->execute();
+	$result = $sql_query->fetch();
+	
+	
 	$sql_query=$conn->prepare("DELETE FROM screens_groups WHERE group_id=?");
 	$sql_query->bindParam(1,$group_id);
 	$sql_query->execute();
 	
-	$sql_query=$conn->prepare("DELETE FROM users_privileges WHERE group_id=?");
+	$sql_query=$conn->prepare("DELETE FROM users_privileges WHERE group_id=? AND user_id <> ?");
 	$sql_query->bindParam(1,$group_id);
+	$sql_query->bindParam(2,$result['id']);
 	$sql_query->execute();
 	
 	for ($i=0;$i<count($_POST['screens']);$i=$i+1) {

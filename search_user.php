@@ -1,9 +1,5 @@
 <?php
-	session_start();
-	if ((!isset($_SESSION['admin'])) || ($_SESSION['admin'] != "root"))
-	{
-		header('Location: login_page.php');
-	}
+	require_once('session_check_root.php');
 ?>
 
 <!DOCTYPE html>
@@ -20,7 +16,7 @@
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="js/sidebar.js"></script>
-    <script src="js/validation.js"></script>
+
     <script src="js/search_user.js"></script>
 </head>
 
@@ -31,7 +27,7 @@
 ?>
 <div class="form_design">
 	<h1>Search User</h1>
-	<form method="post" action="search_user.php">
+	<form method="post" action="search_user.php" id ="search">
 		<label>
 			<span>Search: </span><br>
 			<input type="search" name="crit" maxlength="25" value="">
@@ -102,7 +98,7 @@ $conn = NULL;
 	
 	
 <?php include 'footer.php'; ?>
-
+<script src="js/validation.js"></script>
 </body>
 </html>
 

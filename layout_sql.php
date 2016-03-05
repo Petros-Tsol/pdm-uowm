@@ -82,11 +82,12 @@ if ($_POST['button']=="save_btn" && isset($_SESSION['admin'])) //called by layou
 			echo "Please select a new name.";
 		}
 } else if ($_POST['button']=="upd_content" && isset($_SESSION['admin'])) {
-	$sql_query=$conn->prepare("UPDATE contents SET content_html = ?, backcolor = ?, backimage_url = ? WHERE name = ?");
+	$sql_query=$conn->prepare("UPDATE contents SET content_html = ?, backcolor = ?, backimage_url = ?, backimage_option = ? WHERE name = ?");
 	$sql_query->bindParam(1,$_POST['data']);
 	$sql_query->bindParam(2,$_POST['bg_clr']);
 	$sql_query->bindParam(3,$_POST['bg_img']);
-	$sql_query->bindParam(4,$_POST['content_name']);
+	$sql_query->bindParam(4,$_POST['bg_opt']);
+	$sql_query->bindParam(5,$_POST['content_name']);
 	if ($sql_query->execute()) {
 		echo "Content updated.";
 	} else {
@@ -166,6 +167,38 @@ if ($_POST['button']=="save_btn" && isset($_SESSION['admin'])) //called by layou
 	}*/
 	echo json_encode($result);
 	
+} else if (isset($_POST['screen']) && $_POST['button']=="load_scheduler" && isset($_SESSION['admin'])) {
+	$sql_query=$conn->prepare("SELECT id FROM screens WHERE name = ?");
+	$sql_query->bindParam(1,$_POST['screen']);
+	$sql_query->execute();
+	$screen = $sql_query->fetch();
+	
+	$sql_query=$conn->prepare("SELECT content_id FROM content_scheduler WHERE screen_id = ? ORDER BY queue ASC");
+	$sql_query->bindParam(1,$screen['id']);
+	$sql_query->execute();
+	$contents = $sql_query->fetchAll();
+	
+	if (!empty($contents)) {
+		$contents_name = array();
+		
+		foreach ($contents as $row) {
+			$sql_query=$conn->prepare("SELECT name FROM contents WHERE id=?");
+			$sql_query->bindParam(1,$row['content_id']);
+			$sql_query->execute();
+			$result = $sql_query->fetch();
+			
+			array_push($contents_name,$result['name']);
+			
+		}
+		/*
+		$myfile = fopen("debugfiles", "w") or die("Unable to open file!");
+		fwrite($myfile,print_r($contents_name,true));
+		fclose($myfile);
+		*/
+		echo json_encode($contents_name);
+	} else {
+		echo json_encode (array('error' => "No content found for this screen."));
+	}
 } else {
 	echo "An error occured. You have probably signed out. Please re-login and try again.";
 }

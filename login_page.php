@@ -4,6 +4,10 @@
 	{
 		header('Location: control_panel.php');
 	}
+	
+	if (isset($_GET["register"])) {
+		$success = "You have registered. Check your e-mail for your password.";
+	}
 	include('login.php');
 ?>
 
@@ -21,6 +25,7 @@
 
 <body>
 	<h1 class = "main_title">UOWM PUBLIC DISPLAY</h1>
+	<div id = "successful_register"><?php echo $success; ?></div>
 	<div id = "login_form">
 		<form action="login_page.php" method="post">
 			<h1>Log in</h1>

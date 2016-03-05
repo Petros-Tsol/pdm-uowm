@@ -23,7 +23,7 @@ if (isset($_POST['admin'])){
 	//print '<form>';
 	print '<div class="form_design">';
 		print '<h1>Update User</h1>';
-		print '<form action="javascript:void(0)">';
+		print '<form action="javascript:upd_dlt_us(document.getElementsByName(\'submit_reg\')[0].value)">';
 			print '<label>';
 				print '<span>Username:</span>';
 				print '<input type="text" name="uname" maxlength="15" value="'.$username.'" onblur="notblank(this.value,this.name);">';
@@ -43,18 +43,27 @@ if (isset($_POST['admin'])){
 				print '<span>Email:</span><br>';
 				print '<input type="text" name="email" maxlength="50" onblur="checkemail(this.value,this.name);" value="'.$email.'">';
 			print '</label>';
+			
+			print '<label>';
+				print '<span>Password:</span><br>';
+				print '<input type="password" name="password" value="'.$password.'">';
+			print '</label>';
+			
+			print '<label>';
+				print '<span>Retype password:</span><br>';
+				print '<input type="password" name="password_retype" value="'.$password_retype.'">';
+			print '</label>';
 		
 			print '<span>';
 				print str_repeat('&nbsp;', 8);
-				print '<input type="submit" name="submit_reg" class = "submit_btn" value="Update" onclick="upd_dlt_us(this.name);" disabled >';
-				print '<button name="delete_user" class = "submit_btn" value="Delete" onclick="upd_dlt_us(this.name);">Delete</button>';
+				//print '<input type="submit" name="submit_reg" class = "submit_btn" value="Update" onclick="upd_dlt_us(this.name);">';
+				print '<input type="submit" name="submit_reg" class = "submit_btn" value="Update">';
+				print '<button name="delete_user" class = "submit_btn" value="Delete" onclick="upd_dlt_us(this.value);">Delete</button>';
 			print '</span>';
 		print '</form>';
 		print '<div id="retDiv"></div>';
 	print '</div>';
-	//print '</form>';
+
 	$conn = NULL;
-
 }
-
 ?>

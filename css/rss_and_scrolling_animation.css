@@ -29,9 +29,10 @@
 	-webkit-animation-direction: normal; 
 	animation-direction: normal;
 	
-	/* How long it will be last */
-	-webkit-animation-duration: 10s;
-	animation-duration: 10s;
+	/*How long it will be last */
+	-webkit-animation-duration:;
+	animation-duration:;
+	
 	
 	/* How many times it will be executed */
 	-webkit-animation-iteration-count: infinite;

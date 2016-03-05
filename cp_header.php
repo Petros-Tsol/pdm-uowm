@@ -1,3 +1,7 @@
+<?php
+	//require_once('session_check.php');
+?>
+
 <h1 id = "head_title">UOWM PUBLIC DISPLAY</h1>
 
 <?php

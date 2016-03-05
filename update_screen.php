@@ -53,34 +53,68 @@ header('Connection: keep-alive'); //FIREFOX ONLY
 		$myfile = fopen("announcement", "w") or die("Unable to open file!");
 		fwrite($myfile,!empty($result[0]));
 		fclose($myfile);
-		*/	
+		*/
+		
 		if (empty($result[0]) || (time() >= $result[0]['datetimefrom'] && time() <= $result[0]['datetimeto']) == false) { //if no announcement found or if a announcement found but it is not in the time limit.
 			$sql_query=$conn->prepare("SELECT content_id, refresh_rate FROM content_scheduler WHERE screen_id=? ORDER BY queue");
 			$sql_query->bindParam(1,$screen_id);
 			$sql_query->execute();
 			$result=$sql_query->fetchAll();
-			
-			if (time() - $content_time >= $result[$current_content - 1]["refresh_rate"]) {
-				$content_time = time();
 				
-				if ($current_content < count($result)) {
-					$current_content = $current_content + 1;
+			if ($result[$current_content - 1]["refresh_rate"] == 0) {
+				$sql_query=$conn->prepare("SELECT content_id FROM screens WHERE webid = ?");
+				$sql_query->bindParam(1,$id);
+				$sql_query->execute();
+				$selected_content=$sql_query->fetch();
+				
+				//$myfile = fopen("debugfiles", "w") or die("Unable to open file!");
+				//fwrite($myfile,"TOPA TI VRIKES...".$selected_content[0]);
+				//fclose($myfile);
+				
+				
+				if (empty($selected_content['content_id'])) {
+					$sql_query=$conn->prepare("UPDATE screens SET content_id=? WHERE webid = ?");
+					$sql_query->bindParam(1,$result[0]['content_id']);
+					$sql_query->bindParam(2,$id);
+					$sql_query->execute();
 				} else {
-					$current_content = 1;
+					$content_found = 0; 
+					for ($i = 0 ; $i < count($result); $i = $i + 1) { //we want to check if the current content is in this screen content rotation. If it is, then don't change the content of that screen. Probably a user has changed it through his smartphone.					
+						if ($selected_content['content_id'] == $result[$i]['content_id']) {
+							$content_found = 1;
+						}
+					}
+					
+					if ($content_found == 0) {
+						$sql_query=$conn->prepare("UPDATE screens SET content_id=? WHERE webid = ?");
+						$sql_query->bindParam(1,$result[0]['content_id']);
+						$sql_query->bindParam(2,$id);
+						$sql_query->execute();
+					}
 				}
-				
-				/* THIS IS WORKING!!!! NEW WAY FROM NOW
-				$sql_query=$conn->prepare("UPDATE screens AS s JOIN contents AS c
-				SET s.html = c.content_html, s.backcolor = c.backcolor, s.backimage_url = c.backimage_url, s.qrcode_id = c.qrcode_id, s.backimage_option = c.backimage_option WHERE c.id = ? AND s.webid = ?");
-				$sql_query->bindParam(1,$result[$current_content - 1]['content_id']);
-				$sql_query->bindParam(2,$id);
-				$sql_query->execute();
-				*/
-				
-				$sql_query=$conn->prepare("UPDATE screens SET content_id=? WHERE webid = ?");
-				$sql_query->bindParam(1,$result[$current_content - 1]['content_id']);
-				$sql_query->bindParam(2,$id);
-				$sql_query->execute();
+			} else {
+				if (time() - $content_time >= $result[$current_content - 1]["refresh_rate"]) {
+					$content_time = time();
+					
+					if ($current_content < count($result)) {
+						$current_content = $current_content + 1;
+					} else {
+						$current_content = 1;
+					}
+					
+					/* THIS IS WORKING!!!! NEW WAY FROM NOW
+					$sql_query=$conn->prepare("UPDATE screens AS s JOIN contents AS c
+					SET s.html = c.content_html, s.backcolor = c.backcolor, s.backimage_url = c.backimage_url, s.qrcode_id = c.qrcode_id, s.backimage_option = c.backimage_option WHERE c.id = ? AND s.webid = ?");
+					$sql_query->bindParam(1,$result[$current_content - 1]['content_id']);
+					$sql_query->bindParam(2,$id);
+					$sql_query->execute();
+					*/
+					
+					$sql_query=$conn->prepare("UPDATE screens SET content_id=? WHERE webid = ?");
+					$sql_query->bindParam(1,$result[$current_content - 1]['content_id']);
+					$sql_query->bindParam(2,$id);
+					$sql_query->execute();
+				}
 			}
 		} else {
 			if (time() >= $result[0]['datetimefrom'] && time() <= $result[0]['datetimeto']) {
@@ -155,10 +189,11 @@ header('Connection: keep-alive'); //FIREFOX ONLY
 		$content["qr"] = "";
 		echo 'data: '.json_encode($content)."\n\n"; //notify client to close the conenction
 	
-		$sql_query=$conn->prepare("UPDATE screens SET webid=?, valid_time=? WHERE webid=?");
-		$sql_query->bindValue(1,"");
-		$sql_query->bindValue(2,"");
-		$sql_query->bindParam(3,$id);
+		$sql_query=$conn->prepare("UPDATE screens SET webid=?, valid_time=?, content_id=? WHERE webid=?");
+		$sql_query->bindValue(1,null);
+		$sql_query->bindValue(2,null);
+		$sql_query->bindValue(3,null);
+		$sql_query->bindParam(4,$id);
 		$sql_query->execute();
 	}
 	

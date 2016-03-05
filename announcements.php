@@ -1,9 +1,5 @@
 <?php
-	session_start();
-	if (!isset($_SESSION['admin']))
-	{
-		header('Location: login_page.php');
-	}
+	require_once('session_check.php');
 ?>
 
 <!DOCTYPE html>
@@ -81,7 +77,17 @@
 				$result = $sql_query->fetchAll();
 				
 				print "<tr>";
-				print '<td class ="group" rowspan = "'.$number_of_screens[0].'">'.$group_name['name'].'</td>';
+				if ($number_of_screens[0] == 0) {
+					print '<td class ="group">'.$group_name['name'].'</td>';
+					print '<td></td>';
+					print '<td></td>';
+					print '<td></td>';
+					print '<td></td>';
+					print "</tr>";
+					continue;
+				} else {
+					print '<td class ="group" rowspan = "'.$number_of_screens[0].'">'.$group_name['name'].'</td>';
+				}
 				foreach ($result as $ind=>$screen) {
 					if ($ind > 0) {
 						print "<tr>";
@@ -114,17 +120,18 @@
 						print "<td></td>";
 					}
 					print "</tr>";
-				}
 				print "</tr>";
+				}
 			}
 			print "</table>";
 			$conn = null;
 		?>
 	</div>
 	
+	
+	</div>
 	<?php
 		include 'footer.php';
 	?>
-	</div>
 </body>
 </html>

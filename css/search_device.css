@@ -1,6 +1,8 @@
 #results table{
 	border-collapse:collapse;
 	background-color:#A9FFFF;
+	margin-left:auto;
+	margin-right:auto;
 }
 
 #results .active_groups{

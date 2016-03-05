@@ -19,7 +19,7 @@ if (isset($_POST['screen'])){
 	//print '<form>';
 	print '<div class="form_design">';
 		print '<h1>Update Screen</h1>';
-		print '<form action="javascript:void(0)">';
+		print '<form action="javascript:upd_dlt_dev(document.getElementsByName(\'submit_reg\')[0].value)">';
 			print '<label>';
 				print '<span>Screen Name:</span><br>';
 				print '<input id = "'.$id.'" type="text" name="scrname" maxlength="20" value="'.$screen.'" onblur="notblank(this.value,this.name);"/>';
@@ -34,8 +34,8 @@ if (isset($_POST['screen'])){
 			
 			print '<span>';
 				print str_repeat('&nbsp;', 8);
-				print '<input type="submit" name="submit_reg" class = "submit_btn" value="Update" onclick="upd_dlt_dev(this.name);" disabled>';
-				print '<button name="delete_device" class = "submit_btn" value="Delete" onclick="upd_dlt_dev(this.name);">Delete</button>';
+				print '<input type="submit" name="submit_reg" class = "submit_btn" value="Update">';
+				print '<button name="delete_device" class = "submit_btn" value="Delete" onclick="upd_dlt_dev(this.value);">Delete</button>';
 			print '</span>';
 		print '</form>';
 		print '<div id="retDiv"></div>';
