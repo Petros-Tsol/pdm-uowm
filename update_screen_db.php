@@ -32,9 +32,25 @@ function activate_screen($connection,$screen,$webid) {
 			echo "A problem occured. Please try again.";
 		}
 	} else { //if the screen has a webid
-		$_SESSION['device_id'] = htmlspecialchars($webid);
-		$_SESSION['unique'] = false;
-		echo "ok";
+		$sql_query=$connection->prepare("SELECT valid_time FROM screens WHERE webid LIKE ?");
+		$sql_query->bindParam(1,$webid);
+		$sql_query->execute();
+		$result = $sql_query->fetch();
+		
+		if (time() < $result['valid_time']){
+			$_SESSION['device_id'] = htmlspecialchars($webid);
+			$_SESSION['unique'] = false;
+			echo "ok";
+		} else {
+			$sql_query=$connection->prepare("UPDATE screens SET valid_time = ? WHERE webid LIKE ?");
+			$sql_query->bindValue(1,null);
+			$sql_query->bindParam(2,$webid);
+			$sql_query->execute();
+			
+			$_SESSION['device_id'] = htmlspecialchars($webid);
+			$_SESSION['unique'] = true;
+			echo "ok";
+		}
 	}
 	
 }

@@ -1,6 +1,10 @@
 $(document).ready(function(){
 	$(".menu_button").click(function(){
-		$(this).nextUntil("br").fadeToggle(100);
+		if ($(this).nextUntil("br").css("display") == "block") {
+			$(this).nextUntil("br").css("display","none");
+		} else {
+			$(this).nextUntil("br").css("display","block");
+		}
 	});
 	
 	$("#cpside > button").on({
