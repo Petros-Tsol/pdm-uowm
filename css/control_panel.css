@@ -3,8 +3,6 @@
 	display:inline-block;
 	left:0%;
 	right:0%;
-	margin-left:auto;
-	margin-right:auto;
 	text-align:center;
 	background-color:#A9FFFF;
 	padding:0.2em;
@@ -15,6 +13,7 @@
 
 #basic_msg{
 	position:relative;
+	display:table;
 	background-color:#5A79D6;
 	color:white;
 	margin-left:auto;

@@ -267,6 +267,7 @@ $(function() {
 					}		
 					$("body").css('background-image',data.bg_img); //set background image
 					$("body").css('background-color',data.bg_color); //set background color
+
 					$("body").append(data.html);
 					//console.log(event.data);
 					

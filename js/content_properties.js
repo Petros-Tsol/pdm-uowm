@@ -188,6 +188,7 @@ function div_properties(qr_id) {
 	});
 
 	$(".weather_script").each(function(){ //hide the container div of a weather script
+		console.log("hi there");
 		$(this).parent().css({"visibility":"hidden"});
 		$(this).css({"visibility":"visible"});
 	});

@@ -91,12 +91,34 @@ function draw(){ //function to draw divs
 
 $(document).on("click",".draw_div",function(){
 	var slc_div = $(this).attr("data-pdm-draw-div");
+	var div_unique_id = $("#draw_area > .draw_div[data-pdm-draw-div="+slc_div+"]").attr("id");
 	$("#mydiv").val(slc_div);
 	$("#mydiv").trigger("click");
 	
 	$("#manage_div").val(slc_div);
+	$('#'+div_unique_id).removeClass("draw_div_hover");
 	$("#manage_div").trigger("change");
+	$('#'+div_unique_id).addClass("draw_div_hover");
 });
+
+$("#draw_area").on({
+	mouseenter: function() {
+		$(this).addClass("draw_div_hover");
+	},
+	mouseleave: function(){
+		$(this).removeClass("draw_div_hover");
+	}
+	},".draw_div");
+
+/*
+$(".draw_div").hover(
+	function(){
+		$(this).addClass("draw_div_hover");
+		console.log("mpika");
+	}, function() {
+		$(this).removeClass("draw_div_hover");
+	}
+);*/
 
 
 $(document).on("dragstop",".draw_div",function(){ //if a div moved, recalculate new position and convert width, height, top, and left in percentages in order to fit in any screen resolution.
@@ -219,7 +241,7 @@ function get_divs(element){//function to create a select box of the created divs
 	
 	if (element == "current_divs"){
 		$("#"+element).append('<button type="button" id="fade_toggle_div">Fade Div</button>');
-		$("#"+element).append('<button type="button" id="toggle_border">Fade Border</button>');
+		$("#"+element).append('<button type="button" id="toggle_border" class = "active_border">Border</button>');
 		$("#"+element).append('<button type="button" id="rename_div">Rename Div</button><br><br>');
 		$("#"+element).append('<label for = "div_z_index">z-index (default 1)</label>');
 		$("#"+element).append('<input id = "div_z_index" class="spinner"><br>');
@@ -241,10 +263,14 @@ $(document).on('change',"#manage_div", function() { //in manage divs menu get th
 	var slc_div = $("#manage_div").val();
 	var div_unique_id = $("#draw_area > .draw_div[data-pdm-draw-div="+slc_div+"]").attr("id");
 	
+	$(".draw_div").removeClass("wrapper_divs");
+	
+	
 	var z_index = $('#'+div_unique_id).css("z-index");
 	var opac = $('#'+div_unique_id).css("opacity");
-	var color = $('#'+div_unique_id).css("background-color")
-	
+	var color = $('#'+div_unique_id).css("background-color");
+	var border_style = $('#'+div_unique_id).css("border-right-style");
+	console.log(border_style);
 	
 	//last_clicked_div = div_unique_id;
 	//last_clicked_div_border = document.getElementById(div_unique_id).style.border;
@@ -264,6 +290,13 @@ $(document).on('change',"#manage_div", function() { //in manage divs menu get th
 	//console.log(bg_color);
 	$("#div_z_index").val(z_index);
 	$("#div_opacity").val(opac);
+	
+	if (border_style == "solid"){
+		$("#toggle_border").addClass("active_border");
+	} else {
+		$("#toggle_border").removeClass("active_border");
+	}
+	
 	$("#div_bg_color").css('background-color','#'+bg_color);
 	$("#div_bg_color").colpickSetColor(bg_color,true)
 	$("#div_bg_color").colpick({submit:1, layout:'hex',
@@ -275,6 +308,8 @@ $(document).on('change',"#manage_div", function() { //in manage divs menu get th
 		$(el).colpickHide();
 		return false;
 	}});
+	
+	$("#"+div_unique_id).addClass("wrapper_divs");
 });
 
 $(document).on('change',"#device", function() {
@@ -338,7 +373,8 @@ function preview_screen(){ //function to preview a content
 	}
 	
 	//alert(draw_area_data);
-	preview_data = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Layout Preview</title><style>html{width:100%; height:100%; overflow:hidden} body {background-color:'+data_html[0]+'; background-image:'+data_html[1]+'; background-repeat:'+data_html[2]+'; background-size:'+bg_size+' '+bg_size+'; width:100%; height:100%;} .video_div{height:100%;} video{min-width: 100%; min-height: 100%; width: inherit; height: inherit;} div:not(.weather_script) > iframe{width:100%;height:100%;}</style><link rel="stylesheet" type="text/css" href="css/rss_and_scrolling_animation.css"><script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script><script src="../flipclock/flipclock.js"></script><link rel="stylesheet" href="../flipclock/flipclock.css"><script type="text/javascript" src="js/qrcode.js"></script><script type="text/javascript" src="http://service.24media.gr/js/deltiokairou_widget.js"></script></head><body>'+data_html[3]+'<script src="js/content_properties.js"></script><script>$(function() { div_properties("ID WILL BE GENERATED AT SCREEN UPDATE"); rss_update(); div_visibility(); });</script></body></html>';
+	//http://service.24media.gr/js/deltiokairou_widget.js
+	preview_data = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Layout Preview</title><style>html{width:100%; height:100%; overflow:hidden} body {background-color:'+data_html[0]+'; background-image:'+data_html[1]+'; background-repeat:'+data_html[2]+'; background-size:'+bg_size+' '+bg_size+'; width:100%; height:100%;} .video_div{height:100%;} video{min-width: 100%; min-height: 100%; width: inherit; height: inherit;} div:not(.weather_script) > iframe{width:100%;height:100%;}</style><link rel="stylesheet" type="text/css" href="css/rss_and_scrolling_animation.css"><script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script><script src="../flipclock/flipclock.js"></script><link rel="stylesheet" href="../flipclock/flipclock.css"><script type="text/javascript" src="js/qrcode.js"></script><script src="js/content_properties.js"></script><script type="text/javascript" src="js/deltiokairou_widget.js"></script></head><body>'+data_html[3]+'<script>$(function() { div_properties("ID WILL BE GENERATED AT SCREEN UPDATE"); rss_update(); div_visibility(); });</script></body></html>';
 	preview_window = window.open("", "Preview", "width="+preview_window_width+",height="+preview_window_height+",resizable=no, menubar=no");
 	preview_window.document.open();
 	preview_window.document.write(preview_data);
@@ -917,8 +953,10 @@ $(document).on('click', "#toggle_border", function(){ //put or remove the border
 	$('#'+div_unique_id).removeClass("wrapper_divs");
 	if ($('#'+div_unique_id).css("border-right-style")=="solid") {
 		$('#'+div_unique_id).css("border-style","initial");
+		$("#toggle_border").removeClass("active_border");
 	} else {
 		$('#'+div_unique_id).css("border-style","solid");
+		$("#toggle_border").addClass("active_border");
 	}
 	$('#'+div_unique_id).addClass("wrapper_divs");
 	/*
@@ -1329,9 +1367,10 @@ $(document).on('click ',"#mydiv", function() {//when a div change get the the co
 	if ($("#"+div_unique_id).hasClass("rss_feed")){ //if it has RSS
 		$("input:radio[name=data_type]:eq(4)").prop('checked', true); //select the radio
 		$("input:radio[name=data_type]:eq(4)").trigger("change"); //trigger the function. if this line commented it will not change to this radio.
-		
+		var rss_link = $("#"+div_unique_id).attr("data-pduowm-rss");
 		var rss_items = $("#"+div_unique_id).attr("data-pduowm-rss-items");
 		$("#rss_items").val(rss_items);
+		$("#rss_url").val(rss_link);
 	} else if ($("#"+div_unique_id).children("img").length > 0) { //if it has image
 		$("input:radio[name=data_type]:eq(1)").prop('checked', true); //select the radio
 		$("input:radio[name=data_type]:eq(1)").trigger("change"); //trigger the function. if this line commented it will not change to this radio.
@@ -1405,6 +1444,7 @@ $(document).on('click ',"#mydiv", function() {//when a div change get the the co
 	} else if ($("#"+div_unique_id).children("iframe").length > 0) {
 		$("input:radio[name=data_type]:eq(8)").prop('checked', true);
 		$("input:radio[name=data_type]:eq(8)").trigger("change");
+		$("#iframe_url").val($("#"+div_unique_id+" > iframe").attr("src"));
 	}
 });
 
@@ -1744,8 +1784,13 @@ $(document).on('click', "#weather_plugin", function(){ //add a weather plugin
 			$.getScript("http://service.24media.gr/js/deltiokairou_widget.js", function(){
 				script = document.createElement('script');
 				script.type = 'text/javascript';
-				script.innerHTML='set_url("'+city_id+'", "http://service.24media.gr/app/forecast/lat/'+city_lat+'/lon/'+city_lon+'/alt/0/single-square.html?label='+city_label+'&noItems=20&interval=6&time=6&css=/css/single-square.css&color=RED&js=/js/single-square.js");';
+				script.src = "http://service.24media.gr/js/deltiokairou_widget.js";
 				$('#draw_area > #'+div_unique_id+' > .weather_script').append(script);
+				
+				script2 = document.createElement('script');
+				script2.type = 'text/javascript';
+				script2.innerHTML='set_url("'+city_id+'", "http://service.24media.gr/app/forecast/lat/'+city_lat+'/lon/'+city_lon+'/alt/0/single-square.html?label='+city_label+'&noItems=20&interval=6&time=6&css=/css/single-square.css&color=RED&js=/js/single-square.js");';
+				$('#draw_area > #'+div_unique_id+' > .weather_script').append(script2);
 			});
 			
 			//$('#draw_area > #'+slc_div+' > .weather_script').append(script);

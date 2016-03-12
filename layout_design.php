@@ -27,7 +27,7 @@
 	<script type="text/javascript" src="js/qrcode.js"></script>
 	<script src="/pd_uowm/ckeditor/ckeditor.js"></script>
 	
-	<script type="text/javascript" src="http://service.24media.gr/js/deltiokairou_widget.js"></script>
+	<script type="text/javascript" src="js/deltiokairou_widget.js"></script>
 </head>
 <body onbeforeunload = "return warning_message()">
 <div id="tools">
@@ -139,7 +139,7 @@
 			<label><input type="radio"  name="data_type" value="timer">Clock/Countdown</label><br>
 			<label><input type="radio"  name="data_type" value="qrcodes">QR Code</label><br>
 			<label><input type="radio"  name="data_type" value="iframe">Iframe</label><br>
-			<label><input type="radio"  name="data_type" value="bg">Background</label><br>
+			<label><input type="radio"  name="data_type" value="bg">Screen Background</label><br>
 			<label><input type="radio"  name="data_type" value="html">HTML</label><br>
 		</form>
 		<div id = "mode"></div>	

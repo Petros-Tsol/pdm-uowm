@@ -51,7 +51,8 @@
 	<link rel="stylesheet" href="../flipclock/flipclock.css">
 
 	<script type="text/javascript" src="js/qrcode.js"></script>
-	<script type="text/javascript" src="http://service.24media.gr/js/deltiokairou_widget.js"></script>
+	<script type="text/javascript" src="js/deltiokairou_widget.js"></script>
+	<!--<script type="text/javascript" src="http://service.24media.gr/js/deltiokairou_widget.js"></script>-->
 	
 </head>
 
