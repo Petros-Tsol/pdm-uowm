@@ -1,4 +1,4 @@
-connect2db
-ckeditor/
-connect.inc
+#connect2db
+#ckeditor/
+#connect.inc
 testfiles/
