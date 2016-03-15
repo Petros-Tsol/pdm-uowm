@@ -21,8 +21,8 @@
     <script src="js/colpick.js" type="text/javascript"></script>
 	<link rel="stylesheet" href="css/colpick.css">
 	
-	<script src="../flipclock/flipclock.js"></script>
-	<link rel="stylesheet" href="../flipclock/flipclock.css">
+	<script src="flipclock/flipclock.js"></script>
+	<link rel="stylesheet" href="flipclock/flipclock.css">
 	
 	<script type="text/javascript" src="js/qrcode.js"></script>
 	<script src="/pd_uowm/ckeditor/ckeditor.js"></script>

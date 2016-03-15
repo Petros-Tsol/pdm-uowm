@@ -1,6 +1,6 @@
 <?php
 // For 1.3+:
-require_once('../php/autoloader.php');
+require_once('php/autoloader.php');
  
 // We'll process this feed with all of the default options.
 $feed = new SimplePie();
