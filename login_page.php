@@ -4,10 +4,7 @@
 	{
 		header('Location: control_panel.php');
 	}
-	
-	if (isset($_GET["register"])) {
-		$success = "You have registered. Check your e-mail for your password.";
-	}
+
 	include('login.php');
 ?>
 

@@ -1,6 +1,6 @@
 <?php
-    $db_user='myuser';
-    $db_pass='mypassword';
+    $db_user='diploma';
+    $db_pass='0pdLT4WM!';
     $db='PDM';
     $host='localhost';
 ?>

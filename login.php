@@ -28,7 +28,6 @@ if (isset($_POST['submit_login']))
 	} else {
 		$error  = "Username or password is not correct.";
 	}
-	
 }
 
 

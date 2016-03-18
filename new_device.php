@@ -50,7 +50,7 @@ if(isset($_POST['submit_reg'])) {
 			$sql_query->bindParam(3,$unique_id);
 			
 			if ($sql_query->execute()) {
-				$success_msg = "New device created.";
+				$success_msg = "New screen created.";
 				
 				if (!empty($groups)){ //run this block if admin has selected at least one group
 					$sql_query=$conn->prepare("SELECT id FROM screens WHERE name = ?"); //find screen id

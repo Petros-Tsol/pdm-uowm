@@ -1,5 +1,5 @@
 <?php
-	//require_once('session_check_root.php');
+	require_once('session_check_root.php');
 ?>
 
 <?php
@@ -106,7 +106,6 @@ if(isset($_POST['submit_reg'])) {
 					$fname="";
 					$lname="";
 					$email="";
-					header('Location: login_page.php?register=success');
 					$success_msg = 'New user registered. An e-mail have sent to him/her.';
 				}
 			}

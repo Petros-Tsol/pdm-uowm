@@ -115,8 +115,11 @@ function div_visibility(){
 function init_qrcode(qr_un_id){ //set a qrcode to change layout
 	$(".qrcode_layout").attr("id","qrcode");
 	$(".qrcode_layout").empty();
+	var url = window.location.href;
+	var domain = url.substring(0,url.lastIndexOf("/")+1);
 	var qrcode = new QRCode(document.getElementById("qrcode"), {
-		text : window.location.protocol+'//'+window.location.host+"/pd_uowm/select_layout.php?qr="+qr_un_id,
+		//text : window.location.protocol+'//'+window.location.host+"/pd_uowm/select_layout.php?qr="+qr_un_id,
+		text : domain+"select_layout.php?qr="+qr_un_id,
 		width : 100,
 		height : 100,
 		correctLevel : QRCode.CorrectLevel.H
