@@ -3,7 +3,7 @@ Design and Implementation of a Public Display Management System for the Universi
 
 ## Description
 This repository contains the source code of my bachelor thesis.
-The system consists of a website and multiple base stations with an attached screen access to internet. The website includes a design tool for creating, without special knowledge, a enviroment which consists of various elements. This enviroment, is structured like a HTML webpage. The elements of the enviroment, are various data types like text, image and video.
+The system consists of a website and multiple base stations with an attached screen and access to internet. The website includes a design tool for creating, without special knowledge, a enviroment which consists of various elements. This enviroment, is structured like a HTML webpage. The elements of the enviroment, are various data types like text, image and video.
 Then we can push this enviroment to a base station. The role of the base station is to display it to a web browser, formatting it, according to the elements that have included. The base stations consists of a computer, with minimum requirements in hardware.
 
 ## Basic Installation and Instructions
